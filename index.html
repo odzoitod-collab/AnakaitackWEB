@@ -23,7 +23,7 @@
             --orange: #FF9500;
         }
 
-        /* Dark mode support via Telegram params */
+        /* Dark mode */
         body.dark-mode {
             --bg: #1c1c1e;
             --bg-sec: #000000;
@@ -34,87 +34,91 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--bg-sec); color: var(--text); padding-bottom: 80px; min-height: 100vh; transition: background 0.2s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--bg-sec); color: var(--text); padding-bottom: 90px; min-height: 100vh; transition: background 0.2s; -webkit-font-smoothing: antialiased; }
         
-        /* Layout */
-        .header { background: var(--card-bg); padding: 16px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
-        .header-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; font-weight: 700; flex-shrink: 0; }
+        /* Header */
+        .header { background: var(--card-bg); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
+        .header-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; font-weight: 700; font-size: 14px; flex-shrink: 0; }
         .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .header-info { flex: 1; }
-        .header-name { font-weight: 700; font-size: 17px; }
-        .header-role { font-size: 13px; color: var(--hint); display: flex; align-items: center; gap: 6px; }
+        .header-info { flex: 1; min-width: 0; }
+        .header-name { font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-role { font-size: 12px; color: var(--hint); display: flex; align-items: center; gap: 6px; }
         
-        /* Navigation Tabs */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 6px 24px; border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        /* Navigation */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 6px 30px; border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); font-size: 10px; font-weight: 500; padding: 4px 12px; border-radius: 12px; transition: 0.2s; border: none; background: none; cursor: pointer; width: 64px; }
         .nav-item svg { width: 24px; height: 24px; transition: 0.2s; }
         .nav-item.active { color: var(--accent); }
         .nav-item.active svg { transform: translateY(-2px); }
 
-        /* Content Areas */
+        /* Views */
         .view { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards & Stats */
+        /* Components */
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
         .hero-card { background: var(--accent-gradient); color: #fff; padding: 24px; }
-        .hero-card .label { opacity: 0.8; font-size: 13px; font-weight: 500; }
-        .hero-card .value { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin: 4px 0 16px; }
+        .hero-card .label { opacity: 0.85; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-card .value { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin: 4px 0 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .mini-stat { background: rgba(255,255,255,0.15); border-radius: 14px; padding: 12px; backdrop-filter: blur(10px); }
-        .mini-stat .v { font-size: 18px; font-weight: 700; }
-        .mini-stat .l { font-size: 11px; opacity: 0.8; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mini-stat { background: rgba(255,255,255,0.2); border-radius: 16px; padding: 14px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .mini-stat .v { font-size: 20px; font-weight: 700; line-height: 1.2; }
+        .mini-stat .l { font-size: 11px; opacity: 0.9; margin-top: 2px; }
 
-        .section-title { font-size: 20px; font-weight: 700; margin: 24px 4px 12px; display: flex; align-items: center; justify-content: space-between; }
+        .section-title { font-size: 19px; font-weight: 700; margin: 24px 4px 12px; display: flex; align-items: center; justify-content: space-between; letter-spacing: -0.3px; }
         
-        /* Charts */
-        .chart-wrapper { height: 220px; width: 100%; position: relative; }
-        .chart-scroll-container { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
-        .chart-scroll-inner { min-width: 600px; height: 220px; } /* Делаем график широким для скролла */
-
+        .chart-wrapper { height: 220px; width: 100%; position: relative; margin-top: 10px; }
+        
         /* Leaderboard */
         .search-box { position: sticky; top: 0; background: var(--bg-sec); padding: 0 0 12px; z-index: 10; }
-        .search-input { width: 100%; background: var(--card-bg); border: none; padding: 12px 44px 12px 16px; border-radius: 14px; font-size: 15px; color: var(--text); box-shadow: var(--shadow); transition: 0.2s; }
-        .search-input:focus { transform: scale(1.01); }
-        .search-icon { position: absolute; right: 16px; top: 12px; color: var(--hint); pointer-events: none; }
+        .search-input { width: 100%; background: var(--card-bg); border: none; padding: 14px 44px 14px 16px; border-radius: 16px; font-size: 15px; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; -webkit-appearance: none; }
+        .search-input:focus { box-shadow: 0 4px 12px rgba(42, 171, 238, 0.2); }
+        .search-icon { position: absolute; right: 16px; top: 14px; color: var(--hint); pointer-events: none; }
 
-        .user-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--card-bg); border-radius: 16px; margin-bottom: 8px; transition: 0.15s; cursor: pointer; }
-        .user-row:active { transform: scale(0.98); opacity: 0.8; }
-        .rank { width: 28px; font-weight: 700; color: var(--hint); text-align: center; font-size: 14px; }
-        .rank.top-1 { color: #FFD700; font-size: 18px; }
+        .user-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card-bg); border-radius: 18px; margin-bottom: 8px; transition: transform 0.1s; cursor: pointer; border: 1px solid transparent; }
+        .user-row:active { transform: scale(0.98); background: var(--bg-sec); }
+        .rank { width: 24px; font-weight: 700; color: var(--hint); text-align: center; font-size: 14px; }
+        .rank.top-1 { color: #FFD700; font-size: 18px; text-shadow: 0 2px 4px rgba(255, 215, 0, 0.2); }
         .rank.top-2 { color: #C0C0C0; font-size: 18px; }
         .rank.top-3 { color: #CD7F32; font-size: 18px; }
         
-        .u-avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--bg-sec); object-fit: cover; }
+        .u-avatar { width: 42px; height: 42px; border-radius: 14px; background: var(--bg-sec); object-fit: cover; }
         .u-info { flex: 1; min-width: 0; }
-        .u-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
         .u-tag { font-size: 12px; color: var(--hint); }
         .u-amount { font-weight: 700; font-size: 15px; color: var(--accent); }
 
-        /* History List */
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        /* History */
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .history-item:last-child { border-bottom: none; }
-        .h-left { display: flex; gap: 12px; align-items: center; }
-        .h-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(42, 171, 238, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .h-meta { display: flex; flex-direction: column; }
-        .h-service { font-weight: 600; font-size: 14px; }
-        .h-date { font-size: 11px; color: var(--hint); }
+        .h-left { display: flex; gap: 14px; align-items: center; }
+        .h-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(42, 171, 238, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .h-meta { display: flex; flex-direction: column; gap: 2px; }
+        .h-service { font-weight: 600; font-size: 15px; }
+        .h-date { font-size: 12px; color: var(--hint); }
         .h-right { text-align: right; }
-        .h-amount { font-weight: 700; font-size: 15px; }
-        .h-user { font-size: 11px; color: var(--hint); }
+        .h-amount { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+        .h-user { font-size: 12px; color: var(--hint); font-weight: 500; }
 
-        /* Profile Modal */
-        #profile-view { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-sec); z-index: 200; overflow-y: auto; padding-bottom: 80px; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
-        #profile-view.open { transform: translateX(0); }
-        .profile-header { background: var(--card-bg); padding: 16px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 10px rgba(0,0,0,0.05); }
-        .back-btn { border: none; background: none; color: var(--accent); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 15px; }
+        /* Profile Bottom Sheet */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(2px); }
+        .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+        .sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-sec); border-radius: 24px 24px 0 0; z-index: 201; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .sheet.open { transform: translateY(0); }
+        .sheet-header { padding: 8px; display: flex; justify-content: center; position: sticky; top: 0; background: var(--bg-sec); z-index: 10; }
+        .sheet-handle { width: 40px; height: 5px; background: var(--hint); opacity: 0.3; border-radius: 10px; margin: 8px 0; }
+        .sheet-close { position: absolute; right: 16px; top: 16px; background: rgba(128,128,128,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); }
 
         /* Loader */
         .loader { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: opacity 0.3s; }
         .spinner { width: 40px; height: 40px; border: 3px solid var(--bg-sec); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Chart Scroll */
+        .chart-scroll-container { overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .chart-scroll-inner { min-width: 600px; height: 220px; }
 
     </style>
 </head>
@@ -124,12 +128,12 @@
     <div class="header">
         <div class="header-avatar" id="myAvatar"></div>
         <div class="header-info">
-            <div class="header-name" id="myName">Loading...</div>
+            <div class="header-name" id="myName">Загрузка...</div>
             <div class="header-role">
-                <span id="myStatus">Воркер</span> • IRL Team
+                <span id="myStatus">...</span>
             </div>
         </div>
-        <div id="connectionStatus" style="width: 8px; height: 8px; background: #34C759; border-radius: 50%;"></div>
+        <div id="connectionStatus" style="width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 8px #34C759;"></div>
     </div>
 
     <!-- VIEW: Overview -->
@@ -140,26 +144,21 @@
             <div class="stats-row">
                 <div class="mini-stat">
                     <div class="v" id="todayTeamProfit">0 ₽</div>
-                    <div class="l">Сегодня</div>
+                    <div class="l">За сегодня</div>
                 </div>
+                <!-- Заменили "Количество воркеров" на "Рекорд выплаты" -->
                 <div class="mini-stat">
-                    <div class="v" id="totalWorkers">0</div>
-                    <div class="l">Воркеров</div>
+                    <div class="v" id="maxProfit">0 ₽</div>
+                    <div class="l">Рекорд выплаты</div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title">Моя статистика</div>
+        <div class="section-title">Динамика команды</div>
         <div class="card">
-            <div class="stats-row" style="margin-top: 0; margin-bottom: 16px;">
-                <div style="text-align: center;">
-                    <div style="font-size: 24px; font-weight: 700; color: var(--accent);" id="myPersonalProfit">0 ₽</div>
-                    <div style="font-size: 12px; color: var(--hint);">Всего</div>
-                </div>
-                <div style="text-align: center; border-left: 1px solid var(--bg-sec);">
-                    <div style="font-size: 24px; font-weight: 700;" id="myRank"># -</div>
-                    <div style="font-size: 12px; color: var(--hint);">В топе</div>
-                </div>
+            <div style="margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px;">
+                <span style="font-size: 24px; font-weight: 700; color: var(--text);" id="chartTotal">0 ₽</span>
+                <span style="font-size: 13px; color: var(--hint);">за 7 дней</span>
             </div>
             <div class="chart-wrapper">
                 <canvas id="mainChart"></canvas>
@@ -167,8 +166,8 @@
         </div>
 
         <div class="section-title">
-            По направлениям
-            <span style="font-size: 13px; font-weight: 400; color: var(--hint);">Все время</span>
+            По сервисам
+            <span style="font-size: 13px; font-weight: 400; color: var(--hint);">Топ 5</span>
         </div>
         <div class="card">
             <div style="height: 200px; display: flex; align-items: center; justify-content: center;">
@@ -184,11 +183,10 @@
             <div class="search-icon">🔍</div>
         </div>
         
-        <!-- Filter Tabs -->
         <div style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;">
-            <button class="filter-chip active" onclick="setLbFilter('all', this)" style="background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Все время</button>
-            <button class="filter-chip" onclick="setLbFilter('month', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Месяц</button>
-            <button class="filter-chip" onclick="setLbFilter('day', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Сегодня</button>
+            <button class="filter-chip active" onclick="setLbFilter('all', this)" style="background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Все время</button>
+            <button class="filter-chip" onclick="setLbFilter('month', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Месяц</button>
+            <button class="filter-chip" onclick="setLbFilter('day', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Сегодня</button>
         </div>
 
         <div id="leaderboardList"></div>
@@ -196,48 +194,52 @@
 
     <!-- VIEW: History -->
     <div id="view-history" class="view">
-        <div class="section-title">Лента профитов</div>
-        <div class="card" id="globalHistoryList" style="min-height: 300px;">
-            <!-- History items injected here -->
-        </div>
+        <div class="section-title">Лента выплат</div>
+        <div class="card" id="globalHistoryList" style="min-height: 300px;"></div>
     </div>
 
-    <!-- OVERLAY: Profile View -->
-    <div id="profile-view">
-        <div class="profile-header">
-            <button class="back-btn" onclick="closeProfile()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                Назад
+    <!-- PROFILE SHEET -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeProfile()"></div>
+    <div class="sheet" id="profileSheet">
+        <div class="sheet-header">
+            <div class="sheet-handle"></div>
+            <button class="sheet-close" onclick="closeProfile()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <div style="font-weight: 600; font-size: 17px;">Профиль</div>
         </div>
-        <div style="padding: 16px;">
-            <div class="card" style="text-align: center; padding: 30px 20px;">
-                <div id="p-avatar" style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: var(--hint); overflow: hidden;"></div>
-                <div id="p-name" style="font-size: 22px; font-weight: 700;">Name</div>
-                <div id="p-tag" style="color: var(--accent); font-size: 14px; margin-bottom: 16px;">@tag</div>
-                <div style="display: inline-block; background: var(--bg-sec); padding: 8px 16px; border-radius: 12px;">
-                    <span style="color: var(--hint); font-size: 12px;">Всего заработано:</span><br>
-                    <span id="p-total" style="font-size: 20px; font-weight: 700;">0 ₽</span>
+        <div style="padding: 0 16px 40px;">
+            <div class="card" style="text-align: center; padding: 30px 20px; background: var(--card-bg); box-shadow: none; border: 1px solid rgba(0,0,0,0.05);">
+                <div id="p-avatar" style="width: 86px; height: 86px; margin: 0 auto 16px; border-radius: 24px; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: var(--hint); overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08);"></div>
+                <div id="p-name" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Name</div>
+                <div id="p-tag" style="color: var(--accent); font-size: 15px; margin-bottom: 20px; font-weight: 500;">@tag</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="background: var(--bg-sec); padding: 12px; border-radius: 16px;">
+                        <div style="font-size: 12px; color: var(--hint); margin-bottom: 4px;">Профитов</div>
+                        <div id="p-count" style="font-size: 18px; font-weight: 700;">0</div>
+                    </div>
+                    <div style="background: var(--bg-sec); padding: 12px; border-radius: 16px;">
+                        <div style="font-size: 12px; color: var(--hint); margin-bottom: 4px;">Сумма</div>
+                        <div id="p-total" style="font-size: 18px; font-weight: 700; color: var(--green);">0 ₽</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-title">Динамика воркера</div>
+            <div class="section-title">Активность</div>
             <div class="card">
                 <div class="chart-scroll-container">
                     <div class="chart-scroll-inner">
                         <canvas id="profileChart"></canvas>
                     </div>
                 </div>
-                <div style="text-align: center; color: var(--hint); font-size: 11px; margin-top: 8px;">Листайте график вправо →</div>
             </div>
 
-            <div class="section-title">Последние профиты</div>
-            <div class="card" id="p-history"></div>
+            <div class="section-title">История выплат</div>
+            <div class="card" id="p-history" style="padding-top: 0; padding-bottom: 0;"></div>
         </div>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- Navbar -->
     <div class="nav-bar">
         <button class="nav-item active" onclick="switchView('overview', this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -253,16 +255,18 @@
         </button>
     </div>
 
-    <!-- Global Loader -->
+    <!-- Loader -->
     <div class="loader" id="loader">
         <div class="spinner"></div>
-        <div style="font-size: 14px; font-weight: 500; color: var(--hint);">Загрузка базы данных...</div>
+        <div style="font-size: 15px; font-weight: 600; color: var(--hint); margin-top: 8px;">Синхронизация данных...</div>
     </div>
 
     <script>
-        // --- CONFIG & INIT ---
+        // --- CONFIG ---
         const SUPABASE_URL = 'https://sqoehqvvrbbgaqvkniyw.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb2VocXZ2cmJiZ2FxdmtuaXl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkzODUsImV4cCI6MjA4MjU2NTM4NX0.-Qam5GFLwzFCvM2MrEYv3HbLeRYUPOLPnLRqcLPcasg';
+        // ВАЖНО: Ниже вставьте SERVICE_ROLE ключ для полного доступа к данным, минуя RLS
+        // Если вы используете 'anon' ключ, некоторые данные могут быть скрыты (Unknown/Guest)
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb2VocXZ2cmJiZ2FxdmtuaXl3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Njk4OTM4NSwiZXhwIjoyMDgyNTY1Mzg1fQ.aGsql2VZ_l_71JQgUfxmjSMEVoLxqiu3sWhTJMTj3oc';
         
         let db;
         try { db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error("DB Error", e); }
@@ -276,18 +280,19 @@
 
         // --- STATE ---
         const state = {
-            userId: tg?.initDataUnsafe?.user?.id || 0, // 0 for testing if not in TG
+            userId: tg?.initDataUnsafe?.user?.id || 0,
             userPhoto: tg?.initDataUnsafe?.user?.photo_url,
             userName: tg?.initDataUnsafe?.user?.first_name || 'Guest',
             users: [],
             profits: [],
+            userMap: {},
             lbFilter: 'all',
             charts: {}
         };
 
-        // --- FORMATTERS ---
+        // --- HELPERS ---
         const fmtMoney = n => new Intl.NumberFormat('ru-RU').format(Math.floor(Number(n))) + ' ₽';
-        const getInitials = n => (n||'??').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        const getInitials = n => (n||'??').replace(/[^a-zA-Zа-яА-Я ]/g, "").split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
         const formatDate = dStr => {
             const d = new Date(dStr);
             const now = new Date();
@@ -295,45 +300,71 @@
             return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
         };
 
-        // --- DATA LOADING ---
+        // Универсальная функция получения имени
+        const getUserName = (u, id) => {
+            if (!u) return `ID: ${id}`;
+            return u.full_name || u.username || u.user_tag || `ID: ${u.id}`;
+        };
+
+        // --- FETCHING (LOOP TO BYPASS 1000 LIMIT) ---
+        async function fetchAllUsers() {
+            let allUsers = [];
+            let from = 0;
+            const step = 999;
+            let fetching = true;
+
+            while(fetching) {
+                // Вытягиваем ВСЮ информацию (*)
+                const { data, error } = await db
+                    .from('users')
+                    .select('*') 
+                    .range(from, from + step);
+                
+                if (error || !data || data.length === 0) {
+                    fetching = false;
+                } else {
+                    allUsers = allUsers.concat(data);
+                    if (data.length < step + 1) fetching = false; // Last page
+                    from += step + 1;
+                }
+            }
+            return allUsers;
+        }
+
         async function init() {
             if(!db) return;
             
-            // 1. Fetch Users (Increased range to 5000 to cover your 1050 users)
-            // We select necessary fields to keep it light
-            const { data: uData, error: uErr } = await db
-                .from('users')
-                .select('id, full_name, user_tag, photo_url, status')
-                .range(0, 4999); 
-
-            // 2. Fetch Profits (Increased range to get full history)
+            // 1. Fetch ALL users recursively to break 1000 limit
+            const uData = await fetchAllUsers();
+            
+            // 2. Fetch Profits (Limit 10k for performance, can optimize if needed)
             const { data: pData, error: pErr } = await db
                 .from('profits')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .range(0, 19999); // Up to 20k rows
-
-            if(uErr || pErr) console.error(uErr, pErr);
+                .range(0, 9999);
 
             state.users = uData || [];
             state.profits = pData || [];
 
-            // Pre-process: Map user IDs to objects for fast lookup
-            state.userMap = {};
+            // Map for O(1) access
             state.users.forEach(u => state.userMap[u.id] = u);
 
             renderApp();
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 300);
+            
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 300);
         }
 
         function renderApp() {
             // Header
             const myUser = state.userMap[state.userId] || { full_name: state.userName, photo_url: state.userPhoto };
-            document.getElementById('myName').innerText = myUser.full_name;
+            document.getElementById('myName').innerText = getUserName(myUser, state.userId);
+            document.getElementById('myStatus').innerText = (myUser.status || 'active').toUpperCase();
             document.getElementById('myAvatar').innerHTML = myUser.photo_url 
                 ? `<img src="${myUser.photo_url}">` 
-                : getInitials(myUser.full_name);
+                : getInitials(getUserName(myUser, state.userId));
             
             // Stats
             const total = state.profits.reduce((acc, p) => acc + Number(p.amount), 0);
@@ -341,20 +372,18 @@
                 .filter(p => new Date(p.created_at).toDateString() === new Date().toDateString())
                 .reduce((acc, p) => acc + Number(p.amount), 0);
 
+            // Find Max Profit
+            const maxP = state.profits.reduce((max, p) => Math.max(max, Number(p.amount)), 0);
+
             document.getElementById('totalTeamProfit').innerText = fmtMoney(total);
             document.getElementById('todayTeamProfit').innerText = fmtMoney(today);
-            document.getElementById('totalWorkers').innerText = state.users.length;
+            document.getElementById('maxProfit').innerText = fmtMoney(maxP); // Новая метрика
 
-            // My Personal Stats
-            const myProfits = state.profits.filter(p => p.worker_id == state.userId);
-            const myTotal = myProfits.reduce((acc, p) => acc + Number(p.amount), 0);
-            document.getElementById('myPersonalProfit').innerText = fmtMoney(myTotal);
+            // Team Dynamics Chart
+            renderTeamChart();
+            renderPieChart();
             
-            // Render Charts
-            renderMainChart(myProfits);
-            renderPieChart(state.profits); // Global distribution
-            
-            // Render Lists
+            // Lists
             renderLeaderboard();
             renderGlobalHistory();
         }
@@ -376,10 +405,10 @@
 
         function renderLeaderboard() {
             const container = document.getElementById('leaderboardList');
-            const term = searchInput.value.toLowerCase();
+            const term = searchInput.value.toLowerCase().trim();
             const now = new Date();
 
-            // Aggregate profits per user based on filter
+            // 1. Calculate stats based on filter
             const agg = {};
             state.profits.forEach(p => {
                 const pDate = new Date(p.created_at);
@@ -393,47 +422,53 @@
                 }
             });
 
-            // Convert to array and sort
-            let sorted = Object.keys(agg).map(id => {
-                const u = state.userMap[id] || { full_name: 'Unknown', id: id };
-                return {
-                    id: id,
+            // 2. Prepare list
+            let list = [];
+            
+            if (term.length > 0) {
+                // Если есть поиск
+                list = state.users.filter(u => {
+                    const name = (u.full_name || '').toLowerCase();
+                    const username = (u.username || '').toLowerCase();
+                    const tag = (u.user_tag || '').toLowerCase();
+                    const id = String(u.id);
+                    return name.includes(term) || username.includes(term) || tag.includes(term) || id.includes(term);
+                }).map(u => ({
+                    id: u.id,
                     user: u,
+                    total: agg[u.id] || 0
+                })).sort((a,b) => b.total - a.total);
+            } else {
+                // Если нет поиска
+                list = Object.keys(agg).map(id => ({
+                    id: id,
+                    user: state.userMap[id], // Может быть undefined, если юзер не в базе, но есть в профитах
                     total: agg[id]
-                };
-            }).sort((a,b) => b.total - a.total);
-
-            // Filter by search
-            if (term) {
-                sorted = sorted.filter(item => 
-                    (item.user.full_name || '').toLowerCase().includes(term) || 
-                    (item.user.user_tag || '').toLowerCase().includes(term)
-                );
+                })).sort((a,b) => b.total - a.total).slice(0, 100); 
             }
 
-            // Calculate my rank
-            const myIndex = sorted.findIndex(x => x.id == state.userId);
-            document.getElementById('myRank').innerText = myIndex !== -1 ? `#${myIndex + 1}` : '-';
-
-            // HTML Generation
-            if(sorted.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--hint)">Ничего не найдено</div>`;
+            if(list.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--hint)">${term ? 'Ничего не найдено' : 'Пока нет данных'}</div>`;
                 return;
             }
 
-            container.innerHTML = sorted.map((item, idx) => {
+            container.innerHTML = list.map((item, idx) => {
                 const rank = idx + 1;
-                const rankClass = rank <= 3 ? `top-${rank}` : '';
+                const rClass = (state.lbFilter === 'all' && !term) ? (rank <= 3 ? `top-${rank}` : '') : '';
                 const u = item.user;
-                const ava = u.photo_url ? `<img src="${u.photo_url}" class="u-avatar">` : `<div class="u-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--hint)">${getInitials(u.full_name)}</div>`;
+                const id = item.id;
+                
+                const displayName = getUserName(u, id);
+                const ava = u && u.photo_url ? `<img src="${u.photo_url}" class="u-avatar">` : `<div class="u-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--hint)">${getInitials(displayName)}</div>`;
+                const tag = u ? (u.username ? '@'+u.username : (u.user_tag ? '#'+u.user_tag : '')) : '';
                 
                 return `
-                <div class="user-row" onclick="openProfile('${item.id}')">
-                    <div class="rank ${rankClass}">${rank}</div>
+                <div class="user-row" onclick="openProfile('${id}')">
+                    <div class="rank ${rClass}">${rank}</div>
                     ${ava}
                     <div class="u-info">
-                        <div class="u-name">${u.full_name}</div>
-                        <div class="u-tag">${u.user_tag ? '@'+u.user_tag : 'ID: ' + item.id}</div>
+                        <div class="u-name">${displayName}</div>
+                        <div class="u-tag">${tag}</div>
                     </div>
                     <div class="u-amount">${fmtMoney(item.total)}</div>
                 </div>
@@ -444,12 +479,13 @@
         // --- GLOBAL HISTORY ---
         function renderGlobalHistory() {
             const list = document.getElementById('globalHistoryList');
-            // Take top 100 recent
-            const recent = state.profits.slice(0, 100); 
+            const recent = state.profits.slice(0, 50);
             
             list.innerHTML = recent.map(p => {
-                const u = state.userMap[p.worker_id] || { full_name: 'Unknown' };
+                const u = state.userMap[p.worker_id];
+                const displayName = getUserName(u, p.worker_id);
                 const icon = p.service_name ? p.service_name[0].toUpperCase() : '$';
+                
                 return `
                 <div class="history-item">
                     <div class="h-left">
@@ -460,30 +496,34 @@
                         </div>
                     </div>
                     <div class="h-right">
-                        <div class="h-amount">+${fmtMoney(p.amount)}</div>
-                        <div class="h-user">${u.full_name}</div>
+                        <div class="h-amount" style="color:var(--green)">+${fmtMoney(p.amount)}</div>
+                        <div class="h-user">${displayName}</div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // --- PROFILE SYSTEM ---
+        // --- PROFILE SHEET ---
         function openProfile(id) {
             const u = state.userMap[id];
-            if(!u) return;
-
+            // Даже если юзера нет в мапе, мы можем показать его профиты по ID
+            
             const uProfits = state.profits.filter(p => p.worker_id == id);
             const total = uProfits.reduce((a,b) => a + Number(b.amount), 0);
 
-            // Populate Info
-            document.getElementById('p-name').innerText = u.full_name;
-            document.getElementById('p-tag').innerText = u.user_tag ? '@'+u.user_tag : '';
+            const displayName = getUserName(u, id);
+            
+            document.getElementById('p-name').innerText = displayName;
+            const tag = u ? (u.username ? '@'+u.username : (u.user_tag ? '#'+u.user_tag : `ID: ${id}`)) : `ID: ${id}`;
+            document.getElementById('p-tag').innerText = tag;
             document.getElementById('p-total').innerText = fmtMoney(total);
-            document.getElementById('p-avatar').innerHTML = u.photo_url 
+            document.getElementById('p-count').innerText = uProfits.length;
+            
+            document.getElementById('p-avatar').innerHTML = (u && u.photo_url) 
                 ? `<img src="${u.photo_url}" style="width:100%;height:100%;object-fit:cover">` 
-                : getInitials(u.full_name);
+                : getInitials(displayName);
 
-            // Populate History
+            // History
             document.getElementById('p-history').innerHTML = uProfits.slice(0, 20).map(p => `
                 <div class="history-item">
                     <div class="h-left">
@@ -501,39 +541,60 @@
             // Draw Chart
             renderProfileChart(uProfits);
 
-            // Show UI
-            document.getElementById('profile-view').classList.add('open');
+            // Open Sheet
+            document.getElementById('sheetOverlay').classList.add('open');
+            document.getElementById('profileSheet').classList.add('open');
         }
 
         function closeProfile() {
-            document.getElementById('profile-view').classList.remove('open');
+            document.getElementById('sheetOverlay').classList.remove('open');
+            document.getElementById('profileSheet').classList.remove('open');
         }
 
         // --- CHARTS ---
-        function renderMainChart(data) {
+        function renderTeamChart() {
             const ctx = document.getElementById('mainChart');
-            // Group by day (last 7 days)
             const days = {};
+            const labels = [];
+            
+            // Generate last 7 days
             for(let i=6; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate() - i);
-                days[d.toLocaleDateString('ru-RU', {weekday:'short'})] = 0;
+                const key = d.toLocaleDateString('ru-RU', {weekday:'short'});
+                days[key] = 0;
+                labels.push(key);
             }
-            data.forEach(p => {
+
+            let weekTotal = 0;
+            // Fill Data
+            state.profits.forEach(p => {
                 const d = new Date(p.created_at);
-                const k = d.toLocaleDateString('ru-RU', {weekday:'short'});
-                if(days[k] !== undefined) days[k] += Number(p.amount);
+                const now = new Date();
+                const diffTime = Math.abs(now - d);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
+                if(diffDays <= 7) {
+                    const k = d.toLocaleDateString('ru-RU', {weekday:'short'});
+                    if(days[k] !== undefined) {
+                        days[k] += Number(p.amount);
+                        weekTotal += Number(p.amount);
+                    }
+                }
             });
+
+            document.getElementById('chartTotal').innerText = fmtMoney(weekTotal);
 
             if(state.charts.main) state.charts.main.destroy();
             state.charts.main = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(days),
+                    labels: labels,
                     datasets: [{
                         label: 'Профит',
-                        data: Object.values(days),
+                        data: labels.map(l => days[l]),
                         backgroundColor: '#2AABEE',
-                        borderRadius: 6
+                        borderRadius: 8,
+                        barThickness: 24
                     }]
                 },
                 options: {
@@ -541,7 +602,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        x: { grid: { display: false } }, 
+                        x: { grid: { display: false }, ticks: { color: '#8e8e93' } }, 
                         y: { display: false } 
                     }
                 }
@@ -550,28 +611,31 @@
 
         function renderProfileChart(data) {
             const ctx = document.getElementById('profileChart');
-            // Group by Date for full history line
             const historyMap = {};
+            
             data.forEach(p => {
                 const d = new Date(p.created_at).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
                 historyMap[d] = (historyMap[d]||0) + Number(p.amount);
             });
-            const labels = Object.keys(historyMap).reverse(); // Oldest first? No, SQL is DESC.
-            // SQL is DESC (newest first). So reverse to draw graph left-to-right (old to new)
             
+            const labels = Object.keys(historyMap).reverse();
+            const values = Object.values(historyMap).reverse();
+
             if(state.charts.profile) state.charts.profile.destroy();
             state.charts.profile = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels.reverse(),
+                    labels: labels,
                     datasets: [{
-                        label: 'Профит',
-                        data: Object.values(historyMap).reverse(),
+                        data: values,
                         borderColor: '#2AABEE',
                         backgroundColor: 'rgba(42, 171, 238, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 4
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2AABEE',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
@@ -586,10 +650,10 @@
             });
         }
 
-        function renderPieChart(allProfits) {
+        function renderPieChart() {
             const ctx = document.getElementById('pieChart');
             const map = {};
-            allProfits.forEach(p => map[p.service_name] = (map[p.service_name]||0) + Number(p.amount));
+            state.profits.forEach(p => map[p.service_name] = (map[p.service_name]||0) + Number(p.amount));
             const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,5);
 
             if(state.charts.pie) state.charts.pie.destroy();
@@ -606,8 +670,9 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: 10 },
                     plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, font: {size: 11} } } 
+                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, font: {size: 11}, color: '#8e8e93' } } 
                     }
                 }
             });
@@ -622,7 +687,6 @@
             btn.classList.add('active');
         };
 
-        // Start
         window.onload = init;
 
     </script>
