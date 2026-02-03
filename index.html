@@ -3,702 +3,628 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IRL Team • Аналитика (Full Amount)</title>
+    <title>IRL Team • Analytics Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-secondary-bg-color: #f4f4f5;
-            --tg-theme-text-color: #000000;
-            --tg-theme-hint-color: #8e8e93;
-            --tg-theme-link-color: #2AABEE;
-            --tg-theme-button-color: #2AABEE;
-            --tg-theme-button-text-color: #ffffff;
-        }
-        :root {
-            --bg: var(--tg-theme-bg-color);
-            --bg2: var(--tg-theme-secondary-bg-color);
-            --text: var(--tg-theme-text-color);
-            --hint: var(--tg-theme-hint-color);
-            --accent: var(--tg-theme-button-color);
-            --accent-light: rgba(42, 171, 238, 0.12);
-            --btn-text: var(--tg-theme-button-text-color);
+            --bg: #ffffff;
+            --bg-sec: #f4f4f5;
+            --text: #000000;
+            --hint: #8e8e93;
+            --accent: #2AABEE;
+            --accent-gradient: linear-gradient(135deg, #2AABEE 0%, #0077ff 100%);
+            --card-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --radius: 20px;
             --green: #34C759;
-            --green-light: rgba(52, 199, 89, 0.12);
-            --orange: #FF9500;
-            --orange-light: rgba(255, 149, 0, 0.12);
             --red: #FF3B30;
-            --purple: #AF52DE;
-            --radius: 16px;
-            --radius-sm: 12px;
-            --shadow: 0 2px 8px rgba(0,0,0,0.04);
+            --orange: #FF9500;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; padding-bottom: 40px; }
+
+        /* Dark mode support via Telegram params */
+        body.dark-mode {
+            --bg: #1c1c1e;
+            --bg-sec: #000000;
+            --text: #ffffff;
+            --hint: #aeaeb2;
+            --card-bg: #2c2c2e;
+            --shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--bg-sec); color: var(--text); padding-bottom: 80px; min-height: 100vh; transition: background 0.2s; }
+        
+        /* Layout */
+        .header { background: var(--card-bg); padding: 16px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
+        .header-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; font-weight: 700; flex-shrink: 0; }
+        .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .header-info { flex: 1; }
+        .header-name { font-weight: 700; font-size: 17px; }
+        .header-role { font-size: 13px; color: var(--hint); display: flex; align-items: center; gap: 6px; }
+        
+        /* Navigation Tabs */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 6px 24px; border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); font-size: 10px; font-weight: 500; padding: 4px 12px; border-radius: 12px; transition: 0.2s; border: none; background: none; cursor: pointer; width: 64px; }
+        .nav-item svg { width: 24px; height: 24px; transition: 0.2s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item.active svg { transform: translateY(-2px); }
+
+        /* Content Areas */
+        .view { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards & Stats */
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .hero-card { background: var(--accent-gradient); color: #fff; padding: 24px; }
+        .hero-card .label { opacity: 0.8; font-size: 13px; font-weight: 500; }
+        .hero-card .value { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin: 4px 0 16px; }
+        
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .mini-stat { background: rgba(255,255,255,0.15); border-radius: 14px; padding: 12px; backdrop-filter: blur(10px); }
+        .mini-stat .v { font-size: 18px; font-weight: 700; }
+        .mini-stat .l { font-size: 11px; opacity: 0.8; }
+
+        .section-title { font-size: 20px; font-weight: 700; margin: 24px 4px 12px; display: flex; align-items: center; justify-content: space-between; }
+        
+        /* Charts */
+        .chart-wrapper { height: 220px; width: 100%; position: relative; }
+        .chart-scroll-container { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
+        .chart-scroll-inner { min-width: 600px; height: 220px; } /* Делаем график широким для скролла */
+
+        /* Leaderboard */
+        .search-box { position: sticky; top: 0; background: var(--bg-sec); padding: 0 0 12px; z-index: 10; }
+        .search-input { width: 100%; background: var(--card-bg); border: none; padding: 12px 44px 12px 16px; border-radius: 14px; font-size: 15px; color: var(--text); box-shadow: var(--shadow); transition: 0.2s; }
+        .search-input:focus { transform: scale(1.01); }
+        .search-icon { position: absolute; right: 16px; top: 12px; color: var(--hint); pointer-events: none; }
+
+        .user-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--card-bg); border-radius: 16px; margin-bottom: 8px; transition: 0.15s; cursor: pointer; }
+        .user-row:active { transform: scale(0.98); opacity: 0.8; }
+        .rank { width: 28px; font-weight: 700; color: var(--hint); text-align: center; font-size: 14px; }
+        .rank.top-1 { color: #FFD700; font-size: 18px; }
+        .rank.top-2 { color: #C0C0C0; font-size: 18px; }
+        .rank.top-3 { color: #CD7F32; font-size: 18px; }
+        
+        .u-avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--bg-sec); object-fit: cover; }
+        .u-info { flex: 1; min-width: 0; }
+        .u-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-tag { font-size: 12px; color: var(--hint); }
+        .u-amount { font-weight: 700; font-size: 15px; color: var(--accent); }
+
+        /* History List */
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .history-item:last-child { border-bottom: none; }
+        .h-left { display: flex; gap: 12px; align-items: center; }
+        .h-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(42, 171, 238, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .h-meta { display: flex; flex-direction: column; }
+        .h-service { font-weight: 600; font-size: 14px; }
+        .h-date { font-size: 11px; color: var(--hint); }
+        .h-right { text-align: right; }
+        .h-amount { font-weight: 700; font-size: 15px; }
+        .h-user { font-size: 11px; color: var(--hint); }
+
+        /* Profile Modal */
+        #profile-view { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-sec); z-index: 200; overflow-y: auto; padding-bottom: 80px; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
+        #profile-view.open { transform: translateX(0); }
+        .profile-header { background: var(--card-bg); padding: 16px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 10px rgba(0,0,0,0.05); }
+        .back-btn { border: none; background: none; color: var(--accent); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 15px; }
+
+        /* Loader */
+        .loader { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: opacity 0.3s; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--bg-sec); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
-    <div class="header" id="header"></div>
-    <div class="tabs" id="tabs"></div>
-    <div id="overview" class="tab-content active"></div>
-    <div id="leaderboard" class="tab-content"></div>
-    <div id="calendar" class="tab-content"></div>
-    <div id="achievements" class="tab-content"></div>
-    <div class="loader" id="loader"><div class="spinner"></div><div class="loader-text">Загрузка данных...</div></div>
-</body>
 
-<style>
-    /* Header */
-    .header { background: var(--bg); padding: 16px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--bg2); }
-    .header-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #1E96D1); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-    .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .header-avatar svg { width: 24px; height: 24px; color: #fff; }
-    .header-info { flex: 1; min-width: 0; }
-    .header-title { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-sub { font-size: 13px; color: var(--hint); margin-top: 2px; display: flex; align-items: center; gap: 6px; }
-    .header-badge { background: var(--green-light); color: var(--green); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-    
-    /* Tabs */
-    .tabs { display: flex; background: var(--bg); padding: 12px 16px; gap: 8px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--bg2); overflow-x: auto; scrollbar-width: none; }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--hint); background: var(--bg2); border-radius: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; border: none; display: flex; align-items: center; gap: 8px; }
-    .tab svg { width: 18px; height: 18px; }
-    .tab.active { background: var(--accent); color: #fff; }
-    .tab.active svg { color: #fff; }
-    
-    /* Stats Card */
-    .stats-card { background: linear-gradient(135deg, var(--accent) 0%, #1E96D1 100%); margin: 16px; border-radius: var(--radius); padding: 24px 20px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(42, 171, 238, 0.3); }
-    .stats-card::before { content: ''; position: absolute; top: -60%; right: -20%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-    .stats-card::after { content: ''; position: absolute; bottom: -40%; left: -10%; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; }
-    .stats-label { font-size: 14px; opacity: 0.9; display: flex; align-items: center; gap: 8px; }
-    .stats-label svg { width: 18px; height: 18px; }
-    .stats-amount { font-size: 40px; font-weight: 700; margin: 8px 0; letter-spacing: -1px; }
-    .stats-row { display: flex; gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
-    .stats-item { flex: 1; text-align: center; }
-    .stats-item-val { font-size: 20px; font-weight: 600; }
-    .stats-item-lbl { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+    <!-- Header -->
+    <div class="header">
+        <div class="header-avatar" id="myAvatar"></div>
+        <div class="header-info">
+            <div class="header-name" id="myName">Loading...</div>
+            <div class="header-role">
+                <span id="myStatus">Воркер</span> • IRL Team
+            </div>
+        </div>
+        <div id="connectionStatus" style="width: 8px; height: 8px; background: #34C759; border-radius: 50%;"></div>
+    </div>
 
-    /* Cards */
-    .section { padding: 0 16px; }
-    .section-title { font-size: 13px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 12px 4px; font-weight: 600; }
-    .card { background: var(--bg); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow); }
-    .card-header { padding: 16px; border-bottom: 1px solid var(--bg2); display: flex; justify-content: space-between; align-items: center; }
-    .card-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-    .card-title svg { width: 20px; height: 20px; color: var(--accent); }
-    
-    /* Stat Grid */
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; }
-    .stat-box { padding: 20px 16px; text-align: center; border-bottom: 1px solid var(--bg2); position: relative; }
-    .stat-box:nth-child(odd) { border-right: 1px solid var(--bg2); }
-    .stat-box:nth-last-child(-n+2) { border-bottom: none; }
-    .stat-box-icon { width: 44px; height: 44px; border-radius: 12px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-    .stat-box-icon svg { width: 22px; height: 22px; }
-    .stat-box-icon.blue { background: var(--accent-light); color: var(--accent); }
-    .stat-box-icon.green { background: var(--green-light); color: var(--green); }
-    .stat-box-icon.orange { background: var(--orange-light); color: var(--orange); }
-    .stat-box-icon.purple { background: rgba(175, 82, 222, 0.12); color: var(--purple); }
-    .stat-box-val { font-size: 24px; font-weight: 700; color: var(--text); }
-    .stat-box-lbl { font-size: 13px; color: var(--hint); margin-top: 4px; }
-    
-    /* Chart Container */
-    .chart-container { padding: 20px 16px; height: 220px; position: relative; }
-    .chart-legend { display: flex; justify-content: center; gap: 20px; padding: 0 16px 16px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--hint); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    /* Leaderboard */
-    .list { background: var(--bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-    .list-item { display: flex; align-items: center; padding: 14px 16px; gap: 12px; transition: background 0.15s; }
-    .list-item:active { background: var(--bg2); }
-    .list-item:not(:last-child) { border-bottom: 1px solid var(--bg2); }
-    .rank-badge { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: var(--bg2); color: var(--hint); flex-shrink: 0; }
-    .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #fff; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4); }
-    .rank-2 { background: linear-gradient(135deg, #E8E8E8, #C0C0C0); color: #666; }
-    .rank-3 { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; }
-    .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #1E96D1); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 16px; overflow: hidden; flex-shrink: 0; }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .user-info { flex: 1; min-width: 0; }
-    .user-name { font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-sub { font-size: 14px; color: var(--green); font-weight: 600; margin-top: 2px; }
-    .user-badge { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 8px; margin-left: 8px; }
-    
-    /* Filter */
-    .filter-select { background: var(--bg2); border: none; color: var(--text); font-size: 14px; font-weight: 500; padding: 8px 12px; border-radius: 10px; cursor: pointer; appearance: none; -webkit-appearance: none; padding-right: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
-
-    /* Calendar */
-    .cal-card { background: var(--bg); border-radius: var(--radius); margin: 16px; overflow: hidden; box-shadow: var(--shadow); }
-    .cal-nav { display: flex; justify-content: space-between; align-items: center; padding: 16px; }
-    .cal-btn { background: var(--bg2); border: none; color: var(--text); cursor: pointer; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-    .cal-btn:active { background: var(--accent-light); }
-    .cal-btn svg { width: 20px; height: 20px; }
-    .cal-title { font-weight: 600; font-size: 17px; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 16px 20px; }
-    .cal-head { text-align: center; font-size: 12px; color: var(--hint); padding: 8px 0; font-weight: 500; }
-    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 500; background: var(--bg2); transition: all 0.2s; }
-    .cal-day.empty { background: transparent; }
-    .cal-day.profit { background: var(--accent-light); color: var(--accent); font-weight: 600; }
-    .cal-day.profit.high { background: var(--accent); color: white; }
-    .cal-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
-    
-    /* Streak Card */
-    .streak-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%); border-radius: var(--radius); margin: 16px; color: #fff; box-shadow: 0 4px 20px rgba(255, 149, 0, 0.3); }
-    .streak-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-    .streak-icon svg { width: 32px; height: 32px; }
-    .streak-content { flex: 1; }
-    .streak-val { font-size: 28px; font-weight: 700; }
-    .streak-lbl { font-size: 14px; opacity: 0.9; margin-top: 2px; }
-
-    /* Achievements */
-    .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
-    .ach-card { background: var(--bg); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); }
-    .ach-card.locked { opacity: 0.6; }
-    .ach-icon { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-    .ach-icon.done { background: linear-gradient(135deg, var(--accent), #1E96D1); }
-    .ach-icon.locked { background: var(--bg2); }
-    .ach-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .ach-desc { font-size: 12px; color: var(--hint); margin-bottom: 10px; }
-    .ach-progress { height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
-    .ach-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #1E96D1); border-radius: 3px; transition: width 0.5s ease; }
-    .ach-status { font-size: 11px; font-weight: 600; margin-top: 8px; }
-    .ach-status.done { color: var(--green); }
-    .ach-status.progress { color: var(--hint); }
-    
-    /* Summary Card */
-    .summary-card { background: var(--bg); border-radius: var(--radius); margin: 16px; padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
-    .summary-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), #1E96D1); border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-    .summary-icon svg { width: 28px; height: 28px; color: #fff; }
-    .summary-content { flex: 1; }
-    .summary-val { font-size: 28px; font-weight: 700; }
-    .summary-lbl { font-size: 14px; color: var(--hint); margin-top: 2px; }
-    
-    /* Tab Content */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    
-    /* Loader */
-    .loader { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-    .loader.hidden { display: none; }
-    .spinner { width: 40px; height: 40px; border: 3px solid var(--bg2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 15px; color: var(--hint); }
-    
-    /* Empty State */
-    .empty { text-align: center; padding: 60px 20px; }
-    .empty-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: var(--bg2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .empty-icon svg { width: 40px; height: 40px; color: var(--hint); }
-    .empty-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .empty-text { font-size: 14px; color: var(--hint); max-width: 260px; margin: 0 auto; }
-</style>
-
-<script>
-    // SVG Icons
-    const ICONS = {
-        chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
-        trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
-        calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>',
-        target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
-        fire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
-        wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>',
-        users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-        trending: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
-        star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
-        chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
-        chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>',
-        clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-        zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
-    };
-    
-    // Config
-    const SUPABASE_URL = 'https://sqoehqvvrbbgaqvkniyw.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb2VocXZ2cmJiZ2FxdmtuaXl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkzODUsImV4cCI6MjA4MjU2NTM4NX0.-Qam5GFLwzFCvM2MrEYv3HbLeRYUPOLPnLRqcLPcasg';
-    
-    let db, tg, userId, userPhoto, userName;
-    try { db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
-    try { 
-        tg = window.Telegram?.WebApp; 
-        if(tg) { 
-            tg.ready(); 
-            tg.expand(); 
-            userId = tg.initDataUnsafe?.user?.id;
-            userPhoto = tg.initDataUnsafe?.user?.photo_url;
-            userName = tg.initDataUnsafe?.user?.first_name || 'Пользователь';
-        } 
-    } catch(e) {}
-    
-    let allProfits = [], allUsers = [], userProfits = [], currentUser = null;
-    let calMonth = new Date();
-    let lbFilter = 'all';
-    let weekChart = null;
-
-    // Helpers
-    const fmt = n => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
-    const fmtShort = n => {
-        if (n >= 1000000) return (n/1000000).toFixed(1) + 'M ₽';
-        if (n >= 1000) return (n/1000).toFixed(1) + 'K ₽';
-        return Math.round(n) + ' ₽';
-    };
-    
-    const sum = arr => arr.reduce((a,b) => a + (parseFloat(b.amount)||parseFloat(b.net_profit)||0), 0);
-
-    const isSameDay = (d1, d2) => d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
-    const getPlural = (n, forms) => {
-        const n10 = n % 10, n100 = n % 100;
-        if(n10 === 1 && n100 !== 11) return forms[0];
-        if(n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
-        return forms[2];
-    };
-    
-    const AVATAR_COLORS = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#98D8C8','#F7DC6F','#BB8FCE','#85C1E9'];
-    const getAvatarColor = id => AVATAR_COLORS[Math.abs(parseInt(id) || 0) % AVATAR_COLORS.length];
-    const getInitials = name => (name || 'U').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
-    
-    const ACHIEVEMENTS = [
-        { id: 'first', title: 'Первый старт', desc: 'Первый профит', target: 1, icon: '🚀' },
-        { id: 'p10', title: 'Десятка', desc: '10 профитов', target: 10, icon: '🎯' },
-        { id: 'p50', title: 'Профи', desc: '50 профитов', target: 50, icon: '💪' },
-        { id: 'p100', title: 'Мастер', desc: '100 профитов', target: 100, icon: '👑' },
-        { id: 'm10k', title: 'Капитал', desc: 'Заработать 10K', target: 10000, isMoney: true, icon: '💰' },
-        { id: 'm50k', title: 'Инвестор', desc: 'Заработать 50K', target: 50000, isMoney: true, icon: '💎' },
-        { id: 'm100k', title: 'Богатей', desc: 'Заработать 100K', target: 100000, isMoney: true, icon: '🏆' },
-        { id: 's3', title: 'Серия', desc: '3 дня подряд', target: 3, isStreak: true, icon: '🔥' },
-        { id: 's7', title: 'Неделя огня', desc: '7 дней подряд', target: 7, isStreak: true, icon: '⚡' },
-        { id: 's30', title: 'Месяц силы', desc: '30 дней подряд', target: 30, isStreak: true, icon: '🌟' }
-    ];
-    
-    // Init tabs
-    document.getElementById('tabs').innerHTML = `
-        <div class="tab active" data-tab="overview">${ICONS.chart} Обзор</div>
-        <div class="tab" data-tab="leaderboard">${ICONS.trophy} Топ</div>
-        <div class="tab" data-tab="calendar">${ICONS.calendar} Календарь</div>
-        <div class="tab" data-tab="achievements">${ICONS.target} Ачивки</div>
-    `;
-    
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.onclick = () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
-        };
-    });
-
-    async function load() {
-        if (!db) { document.getElementById('loader').classList.add('hidden'); return; }
-        
-        // !!! ИСПРАВЛЕНИЕ ЗДЕСЬ !!!
-        // Добавлен range, чтобы загружать больше 1000 строк
-        const [pRes, uRes] = await Promise.all([
-            db.from('profits').select('*').order('created_at', {ascending: false}).range(0, 20000),
-            db.from('users').select('*').eq('status', 'active').range(0, 10000)
-        ]);
-        
-        allProfits = pRes.data || [];
-        allUsers = uRes.data || [];
-        userProfits = userId ? allProfits.filter(p => p.worker_id == userId) : [];
-        currentUser = userId ? allUsers.find(u => u.id == userId) : null;
-        
-        // Render header
-        const avatarHtml = userPhoto 
-            ? `<img src="${userPhoto}" alt="">` 
-            : ICONS.users;
-        const displayName = currentUser?.full_name || userName || 'Пользователь';
-        
-        document.getElementById('header').innerHTML = `
-            <div class="header-avatar">${avatarHtml}</div>
-            <div class="header-info">
-                <div class="header-title">${displayName}</div>
-                <div class="header-sub">
-                    <span>Аналитика команды</span>
-                    <span class="header-badge">IRL Team</span>
+    <!-- VIEW: Overview -->
+    <div id="view-overview" class="view active">
+        <div class="card hero-card">
+            <div class="label">Общий профит команды</div>
+            <div class="value" id="totalTeamProfit">0 ₽</div>
+            <div class="stats-row">
+                <div class="mini-stat">
+                    <div class="v" id="todayTeamProfit">0 ₽</div>
+                    <div class="l">Сегодня</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="v" id="totalWorkers">0</div>
+                    <div class="l">Воркеров</div>
                 </div>
             </div>
-        `;
+        </div>
+
+        <div class="section-title">Моя статистика</div>
+        <div class="card">
+            <div class="stats-row" style="margin-top: 0; margin-bottom: 16px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: var(--accent);" id="myPersonalProfit">0 ₽</div>
+                    <div style="font-size: 12px; color: var(--hint);">Всего</div>
+                </div>
+                <div style="text-align: center; border-left: 1px solid var(--bg-sec);">
+                    <div style="font-size: 24px; font-weight: 700;" id="myRank"># -</div>
+                    <div style="font-size: 12px; color: var(--hint);">В топе</div>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <div class="section-title">
+            По направлениям
+            <span style="font-size: 13px; font-weight: 400; color: var(--hint);">Все время</span>
+        </div>
+        <div class="card">
+            <div style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW: Leaderboard -->
+    <div id="view-leaderboard" class="view">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск по нику или тегу...">
+            <div class="search-icon">🔍</div>
+        </div>
         
-        document.getElementById('loader').classList.add('hidden');
-        renderAll();
-    }
-    
-    function renderAll() { 
-        renderOverview(); 
-        renderLeaderboard(); 
-        renderCalendar(); 
-        renderAchievements(); 
-    }
-    
-    function renderOverview() {
-        const teamTotal = sum(allProfits);
-        const todayProfits = allProfits.filter(p => isSameDay(new Date(p.created_at), new Date()));
-        const teamToday = sum(todayProfits);
-        const myTotal = sum(userProfits);
-        const myToday = sum(userProfits.filter(p => isSameDay(new Date(p.created_at), new Date())));
+        <!-- Filter Tabs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;">
+            <button class="filter-chip active" onclick="setLbFilter('all', this)" style="background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Все время</button>
+            <button class="filter-chip" onclick="setLbFilter('month', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Месяц</button>
+            <button class="filter-chip" onclick="setLbFilter('day', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">Сегодня</button>
+        </div>
+
+        <div id="leaderboardList"></div>
+    </div>
+
+    <!-- VIEW: History -->
+    <div id="view-history" class="view">
+        <div class="section-title">Лента профитов</div>
+        <div class="card" id="globalHistoryList" style="min-height: 300px;">
+            <!-- History items injected here -->
+        </div>
+    </div>
+
+    <!-- OVERLAY: Profile View -->
+    <div id="profile-view">
+        <div class="profile-header">
+            <button class="back-btn" onclick="closeProfile()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Назад
+            </button>
+            <div style="font-weight: 600; font-size: 17px;">Профиль</div>
+        </div>
+        <div style="padding: 16px;">
+            <div class="card" style="text-align: center; padding: 30px 20px;">
+                <div id="p-avatar" style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: var(--hint); overflow: hidden;"></div>
+                <div id="p-name" style="font-size: 22px; font-weight: 700;">Name</div>
+                <div id="p-tag" style="color: var(--accent); font-size: 14px; margin-bottom: 16px;">@tag</div>
+                <div style="display: inline-block; background: var(--bg-sec); padding: 8px 16px; border-radius: 12px;">
+                    <span style="color: var(--hint); font-size: 12px;">Всего заработано:</span><br>
+                    <span id="p-total" style="font-size: 20px; font-weight: 700;">0 ₽</span>
+                </div>
+            </div>
+
+            <div class="section-title">Динамика воркера</div>
+            <div class="card">
+                <div class="chart-scroll-container">
+                    <div class="chart-scroll-inner">
+                        <canvas id="profileChart"></canvas>
+                    </div>
+                </div>
+                <div style="text-align: center; color: var(--hint); font-size: 11px; margin-top: 8px;">Листайте график вправо →</div>
+            </div>
+
+            <div class="section-title">Последние профиты</div>
+            <div class="card" id="p-history"></div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-item active" onclick="switchView('overview', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            Обзор
+        </button>
+        <button class="nav-item" onclick="switchView('leaderboard', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            Топ
+        </button>
+        <button class="nav-item" onclick="switchView('history', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+            История
+        </button>
+    </div>
+
+    <!-- Global Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div style="font-size: 14px; font-weight: 500; color: var(--hint);">Загрузка базы данных...</div>
+    </div>
+
+    <script>
+        // --- CONFIG & INIT ---
+        const SUPABASE_URL = 'https://sqoehqvvrbbgaqvkniyw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxb2VocXZ2cmJiZ2FxdmtuaXl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5ODkzODUsImV4cCI6MjA4MjU2NTM4NX0.-Qam5GFLwzFCvM2MrEYv3HbLeRYUPOLPnLRqcLPcasg';
         
-        // Calculate rank
-        const userMap = {};
-        allProfits.forEach(p => userMap[p.worker_id] = (userMap[p.worker_id]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
-        const rank = Object.entries(userMap).sort((a,b) => b[1]-a[1]).findIndex(x => x[0] == userId) + 1;
-        
-        // Week data for chart
-        const days = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-        const chartLabels = [];
-        const chartData = [];
-        const teamChartData = [];
-        
-        for(let i=6; i>=0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            chartLabels.push(days[d.getDay()]);
-            chartData.push(sum(userProfits.filter(p => isSameDay(new Date(p.created_at), d))));
-            teamChartData.push(sum(allProfits.filter(p => isSameDay(new Date(p.created_at), d))));
+        let db;
+        try { db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error("DB Error", e); }
+
+        const tg = window.Telegram?.WebApp;
+        if(tg) {
+            tg.ready();
+            tg.expand();
+            if(tg.colorScheme === 'dark') document.body.classList.add('dark-mode');
         }
-        
-        // Service breakdown for pie chart
-        const serviceMap = {};
-        userProfits.forEach(p => serviceMap[p.service_name] = (serviceMap[p.service_name]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
-        const serviceData = Object.entries(serviceMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
-        
-        document.getElementById('overview').innerHTML = `
-            <div class="stats-card">
-                <div class="stats-label">${ICONS.wallet} Профит команды</div>
-                <div class="stats-amount">${fmt(teamTotal)}</div>
-                <div class="stats-row">
-                    <div class="stats-item">
-                        <div class="stats-item-val">${fmtShort(teamToday)}</div>
-                        <div class="stats-item-lbl">Сегодня</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-item-val">${allUsers.length}</div>
-                        <div class="stats-item-lbl">Воркеров</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-item-val">${allProfits.length}</div>
-                        <div class="stats-item-lbl">Профитов</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-title">Моя статистика</div>
-                <div class="card">
-                    <div class="stat-grid">
-                        <div class="stat-box">
-                            <div class="stat-box-icon blue">${ICONS.wallet}</div>
-                            <div class="stat-box-val">${fmtShort(myTotal)}</div>
-                            <div class="stat-box-lbl">Всего (100%)</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-icon green">${ICONS.trending}</div>
-                            <div class="stat-box-val">${userProfits.length}</div>
-                            <div class="stat-box-lbl">Профитов</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-icon orange">${ICONS.clock}</div>
-                            <div class="stat-box-val">${fmtShort(myToday)}</div>
-                            <div class="stat-box-lbl">Сегодня</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-icon purple">${ICONS.trophy}</div>
-                            <div class="stat-box-val">#${rank || '—'}</div>
-                            <div class="stat-box-lbl">Позиция в топе</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-title">Динамика за неделю</div>
-                <div class="card">
-                    <div class="chart-container">
-                        <canvas id="weekChart"></canvas>
-                    </div>
-                    <div class="chart-legend">
-                        <div class="legend-item"><div class="legend-dot" style="background: var(--accent)"></div> Мои профиты</div>
-                        <div class="legend-item"><div class="legend-dot" style="background: var(--green)"></div> Команда</div>
-                    </div>
-                </div>
-            </div>
-            
-            ${serviceData.length ? `
-            <div class="section">
-                <div class="section-title">По сервисам</div>
-                <div class="card">
-                    <div class="chart-container" style="height: 200px;">
-                        <canvas id="serviceChart"></canvas>
-                    </div>
-                </div>
-            </div>` : ''}
-        `;
-        
-        // Render charts
-        setTimeout(() => {
-            renderWeekChart(chartLabels, chartData, teamChartData);
-            if (serviceData.length) renderServiceChart(serviceData);
-        }, 100);
-    }
 
-    function renderWeekChart(labels, userData, teamData) {
-        const ctx = document.getElementById('weekChart');
-        if (!ctx) return;
-        
-        if (weekChart) weekChart.destroy();
-        
-        const maxTeam = Math.max(...teamData);
-        const scaledTeam = teamData.map(v => maxTeam > 0 ? (v / maxTeam) * Math.max(...userData, 1) * 0.5 : 0);
-        
-        weekChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Мои профиты',
-                    data: userData,
-                    backgroundColor: 'rgba(42, 171, 238, 0.8)',
-                    borderRadius: 8,
-                    borderSkipped: false,
-                }, {
-                    label: 'Команда',
-                    data: teamData,
-                    backgroundColor: 'rgba(52, 199, 89, 0.3)',
-                    borderRadius: 8,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 12 } } },
-                    y: { display: false }
+        // --- STATE ---
+        const state = {
+            userId: tg?.initDataUnsafe?.user?.id || 0, // 0 for testing if not in TG
+            userPhoto: tg?.initDataUnsafe?.user?.photo_url,
+            userName: tg?.initDataUnsafe?.user?.first_name || 'Guest',
+            users: [],
+            profits: [],
+            lbFilter: 'all',
+            charts: {}
+        };
+
+        // --- FORMATTERS ---
+        const fmtMoney = n => new Intl.NumberFormat('ru-RU').format(Math.floor(Number(n))) + ' ₽';
+        const getInitials = n => (n||'??').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        const formatDate = dStr => {
+            const d = new Date(dStr);
+            const now = new Date();
+            if(d.toDateString() === now.toDateString()) return `Сегодня, ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+        };
+
+        // --- DATA LOADING ---
+        async function init() {
+            if(!db) return;
+            
+            // 1. Fetch Users (Increased range to 5000 to cover your 1050 users)
+            // We select necessary fields to keep it light
+            const { data: uData, error: uErr } = await db
+                .from('users')
+                .select('id, full_name, user_tag, photo_url, status')
+                .range(0, 4999); 
+
+            // 2. Fetch Profits (Increased range to get full history)
+            const { data: pData, error: pErr } = await db
+                .from('profits')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .range(0, 19999); // Up to 20k rows
+
+            if(uErr || pErr) console.error(uErr, pErr);
+
+            state.users = uData || [];
+            state.profits = pData || [];
+
+            // Pre-process: Map user IDs to objects for fast lookup
+            state.userMap = {};
+            state.users.forEach(u => state.userMap[u.id] = u);
+
+            renderApp();
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 300);
+        }
+
+        function renderApp() {
+            // Header
+            const myUser = state.userMap[state.userId] || { full_name: state.userName, photo_url: state.userPhoto };
+            document.getElementById('myName').innerText = myUser.full_name;
+            document.getElementById('myAvatar').innerHTML = myUser.photo_url 
+                ? `<img src="${myUser.photo_url}">` 
+                : getInitials(myUser.full_name);
+            
+            // Stats
+            const total = state.profits.reduce((acc, p) => acc + Number(p.amount), 0);
+            const today = state.profits
+                .filter(p => new Date(p.created_at).toDateString() === new Date().toDateString())
+                .reduce((acc, p) => acc + Number(p.amount), 0);
+
+            document.getElementById('totalTeamProfit').innerText = fmtMoney(total);
+            document.getElementById('todayTeamProfit').innerText = fmtMoney(today);
+            document.getElementById('totalWorkers').innerText = state.users.length;
+
+            // My Personal Stats
+            const myProfits = state.profits.filter(p => p.worker_id == state.userId);
+            const myTotal = myProfits.reduce((acc, p) => acc + Number(p.amount), 0);
+            document.getElementById('myPersonalProfit').innerText = fmtMoney(myTotal);
+            
+            // Render Charts
+            renderMainChart(myProfits);
+            renderPieChart(state.profits); // Global distribution
+            
+            // Render Lists
+            renderLeaderboard();
+            renderGlobalHistory();
+        }
+
+        // --- LEADERBOARD & SEARCH ---
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', () => renderLeaderboard());
+
+        function setLbFilter(filter, btn) {
+            state.lbFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(b => {
+                b.style.background = 'var(--card-bg)';
+                b.style.color = 'var(--hint)';
+            });
+            btn.style.background = 'var(--accent)';
+            btn.style.color = 'white';
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+            const term = searchInput.value.toLowerCase();
+            const now = new Date();
+
+            // Aggregate profits per user based on filter
+            const agg = {};
+            state.profits.forEach(p => {
+                const pDate = new Date(p.created_at);
+                let pass = true;
+                if (state.lbFilter === 'month' && (pDate.getMonth() !== now.getMonth() || pDate.getFullYear() !== now.getFullYear())) pass = false;
+                if (state.lbFilter === 'day' && pDate.toDateString() !== now.toDateString()) pass = false;
+
+                if (pass) {
+                    if (!agg[p.worker_id]) agg[p.worker_id] = 0;
+                    agg[p.worker_id] += Number(p.amount);
                 }
+            });
+
+            // Convert to array and sort
+            let sorted = Object.keys(agg).map(id => {
+                const u = state.userMap[id] || { full_name: 'Unknown', id: id };
+                return {
+                    id: id,
+                    user: u,
+                    total: agg[id]
+                };
+            }).sort((a,b) => b.total - a.total);
+
+            // Filter by search
+            if (term) {
+                sorted = sorted.filter(item => 
+                    (item.user.full_name || '').toLowerCase().includes(term) || 
+                    (item.user.user_tag || '').toLowerCase().includes(term)
+                );
             }
-        });
-    }
-    
-    function renderServiceChart(data) {
-        const ctx = document.getElementById('serviceChart');
-        if (!ctx) return;
-        
-        const colors = ['#2AABEE', '#34C759', '#FF9500', '#AF52DE', '#FF3B30'];
-        
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: data.map(d => d[0]),
-                datasets: [{
-                    data: data.map(d => d[1]),
-                    backgroundColor: colors.slice(0, data.length),
-                    borderWidth: 0,
-                    spacing: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: { 
-                            boxWidth: 12, 
-                            padding: 12,
-                            font: { size: 12 },
-                            color: '#8e8e93'
-                        }
+
+            // Calculate my rank
+            const myIndex = sorted.findIndex(x => x.id == state.userId);
+            document.getElementById('myRank').innerText = myIndex !== -1 ? `#${myIndex + 1}` : '-';
+
+            // HTML Generation
+            if(sorted.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--hint)">Ничего не найдено</div>`;
+                return;
+            }
+
+            container.innerHTML = sorted.map((item, idx) => {
+                const rank = idx + 1;
+                const rankClass = rank <= 3 ? `top-${rank}` : '';
+                const u = item.user;
+                const ava = u.photo_url ? `<img src="${u.photo_url}" class="u-avatar">` : `<div class="u-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--hint)">${getInitials(u.full_name)}</div>`;
+                
+                return `
+                <div class="user-row" onclick="openProfile('${item.id}')">
+                    <div class="rank ${rankClass}">${rank}</div>
+                    ${ava}
+                    <div class="u-info">
+                        <div class="u-name">${u.full_name}</div>
+                        <div class="u-tag">${u.user_tag ? '@'+u.user_tag : 'ID: ' + item.id}</div>
+                    </div>
+                    <div class="u-amount">${fmtMoney(item.total)}</div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- GLOBAL HISTORY ---
+        function renderGlobalHistory() {
+            const list = document.getElementById('globalHistoryList');
+            // Take top 100 recent
+            const recent = state.profits.slice(0, 100); 
+            
+            list.innerHTML = recent.map(p => {
+                const u = state.userMap[p.worker_id] || { full_name: 'Unknown' };
+                const icon = p.service_name ? p.service_name[0].toUpperCase() : '$';
+                return `
+                <div class="history-item">
+                    <div class="h-left">
+                        <div class="h-icon">${icon}</div>
+                        <div class="h-meta">
+                            <div class="h-service">${p.service_name}</div>
+                            <div class="h-date">${formatDate(p.created_at)}</div>
+                        </div>
+                    </div>
+                    <div class="h-right">
+                        <div class="h-amount">+${fmtMoney(p.amount)}</div>
+                        <div class="h-user">${u.full_name}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- PROFILE SYSTEM ---
+        function openProfile(id) {
+            const u = state.userMap[id];
+            if(!u) return;
+
+            const uProfits = state.profits.filter(p => p.worker_id == id);
+            const total = uProfits.reduce((a,b) => a + Number(b.amount), 0);
+
+            // Populate Info
+            document.getElementById('p-name').innerText = u.full_name;
+            document.getElementById('p-tag').innerText = u.user_tag ? '@'+u.user_tag : '';
+            document.getElementById('p-total').innerText = fmtMoney(total);
+            document.getElementById('p-avatar').innerHTML = u.photo_url 
+                ? `<img src="${u.photo_url}" style="width:100%;height:100%;object-fit:cover">` 
+                : getInitials(u.full_name);
+
+            // Populate History
+            document.getElementById('p-history').innerHTML = uProfits.slice(0, 20).map(p => `
+                <div class="history-item">
+                    <div class="h-left">
+                        <div class="h-meta">
+                            <div class="h-service">${p.service_name}</div>
+                            <div class="h-date">${formatDate(p.created_at)}</div>
+                        </div>
+                    </div>
+                    <div class="h-right">
+                        <div class="h-amount">+${fmtMoney(p.amount)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Draw Chart
+            renderProfileChart(uProfits);
+
+            // Show UI
+            document.getElementById('profile-view').classList.add('open');
+        }
+
+        function closeProfile() {
+            document.getElementById('profile-view').classList.remove('open');
+        }
+
+        // --- CHARTS ---
+        function renderMainChart(data) {
+            const ctx = document.getElementById('mainChart');
+            // Group by day (last 7 days)
+            const days = {};
+            for(let i=6; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                days[d.toLocaleDateString('ru-RU', {weekday:'short'})] = 0;
+            }
+            data.forEach(p => {
+                const d = new Date(p.created_at);
+                const k = d.toLocaleDateString('ru-RU', {weekday:'short'});
+                if(days[k] !== undefined) days[k] += Number(p.amount);
+            });
+
+            if(state.charts.main) state.charts.main.destroy();
+            state.charts.main = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(days),
+                    datasets: [{
+                        label: 'Профит',
+                        data: Object.values(days),
+                        backgroundColor: '#2AABEE',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { display: false } 
                     }
                 }
-            }
-        });
-    }
-    
-    function renderLeaderboard() {
-        let data = allProfits;
-        const now = new Date();
-        
-        if (lbFilter === 'month') data = data.filter(p => new Date(p.created_at).getMonth() === now.getMonth() && new Date(p.created_at).getFullYear() === now.getFullYear());
-        else if (lbFilter === 'week') data = data.filter(p => new Date(p.created_at) >= new Date(now.getTime() - 7*24*60*60*1000));
-        else if (lbFilter === 'day') data = data.filter(p => isSameDay(new Date(p.created_at), now));
-        
-        const totals = {};
-        data.forEach(p => totals[p.worker_id] = (totals[p.worker_id]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
-        const sorted = Object.entries(totals)
-            .map(([id, val]) => ({ id, val, user: allUsers.find(u => u.id == id) }))
-            .sort((a,b) => b.val - a.val)
-            .slice(0, 20);
-        
-        const filterLabels = { all: 'Всё время', month: 'Месяц', week: 'Неделя', day: 'Сегодня' };
-        
-        let html = `
-            <div class="section" style="margin-top: 16px;">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">${ICONS.trophy} Рейтинг воркеров</div>
-                        <select class="filter-select" onchange="lbFilter=this.value;renderLeaderboard()">
-                            <option value="all" ${lbFilter=='all'?'selected':''}>Всё время</option>
-                            <option value="month" ${lbFilter=='month'?'selected':''}>Месяц</option>
-                            <option value="week" ${lbFilter=='week'?'selected':''}>Неделя</option>
-                            <option value="day" ${lbFilter=='day'?'selected':''}>Сегодня</option>
-                        </select>
-                    </div>
-                    <div class="list">`;
-        
-        if (sorted.length === 0) {
-            html += `<div class="empty"><div class="empty-text">Нет данных</div></div>`;
-        } else {
-            sorted.forEach((item, idx) => {
-                const rank = idx + 1;
-                const rClass = rank <= 3 ? `rank-${rank}` : '';
-                const u = item.user;
-                const name = u?.full_name || 'Неизвестный';
-                const avatar = u?.photo_url 
-                    ? `<img src="${u.photo_url}">` 
-                    : getInitials(name);
-                
-                html += `
-                    <div class="list-item">
-                        <div class="rank-badge ${rClass}">${rank}</div>
-                        <div class="avatar">${avatar}</div>
-                        <div class="user-info">
-                            <div class="user-name">${name} ${rank===1 ? '👑':''}</div>
-                            <div class="user-sub">${fmtShort(item.val)}</div>
-                        </div>
-                    </div>
-                `;
             });
         }
-        
-        html += `</div></div></div>`;
-        document.getElementById('leaderboard').innerHTML = html;
-    }
 
-    function renderCalendar() {
-        const y = calMonth.getFullYear(), m = calMonth.getMonth();
-        const firstDay = new Date(y, m, 1).getDay();
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-        
-        // Calculate daily profits
-        const daily = {};
-        userProfits.forEach(p => {
-            const d = new Date(p.created_at);
-            if (d.getMonth() === m && d.getFullYear() === y) {
-                const day = d.getDate();
-                daily[day] = (daily[day] || 0) + (parseFloat(p.amount) || parseFloat(p.net_profit) || 0);
-            }
-        });
-        
-        let html = `
-            <div class="cal-card">
-                <div class="cal-nav">
-                    <button class="cal-btn" onclick="changeMonth(-1)">${ICONS.chevronLeft}</button>
-                    <div class="cal-title">${monthNames[m]} ${y}</div>
-                    <button class="cal-btn" onclick="changeMonth(1)">${ICONS.chevronRight}</button>
-                </div>
-                <div class="cal-grid">
-                    ${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => `<div class="cal-head">${d}</div>`).join('')}
-        `;
-        
-        const offset = firstDay === 0 ? 6 : firstDay - 1;
-        for (let i = 0; i < offset; i++) html += `<div class="cal-day empty"></div>`;
-        
-        const maxVal = Math.max(...Object.values(daily), 1);
-        const today = new Date();
-        
-        for (let d = 1; d <= daysInMonth; d++) {
-            const val = daily[d] || 0;
-            let cls = 'cal-day';
-            if (val > 0) cls += ' profit';
-            if (val > maxVal * 0.7) cls += ' high';
-            if (isSameDay(new Date(y, m, d), today)) cls += ' today';
+        function renderProfileChart(data) {
+            const ctx = document.getElementById('profileChart');
+            // Group by Date for full history line
+            const historyMap = {};
+            data.forEach(p => {
+                const d = new Date(p.created_at).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+                historyMap[d] = (historyMap[d]||0) + Number(p.amount);
+            });
+            const labels = Object.keys(historyMap).reverse(); // Oldest first? No, SQL is DESC.
+            // SQL is DESC (newest first). So reverse to draw graph left-to-right (old to new)
             
-            html += `<div class="${cls}">${d}</div>`;
-        }
-        
-        html += `</div></div>`;
-        
-        // Streak calculation
-        let streak = 0;
-        let tempDate = new Date();
-        while (true) {
-            const hasProfit = userProfits.some(p => isSameDay(new Date(p.created_at), tempDate));
-            if (hasProfit) streak++;
-            else if (!isSameDay(tempDate, new Date())) break; 
-            tempDate.setDate(tempDate.getDate() - 1);
-        }
-
-        html += `
-            <div class="streak-card">
-                <div class="streak-icon">${ICONS.fire}</div>
-                <div class="streak-content">
-                    <div class="streak-val">${streak} ${getPlural(streak, ['день','дня','дней'])}</div>
-                    <div class="streak-lbl">Текущая серия профитов</div>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('calendar').innerHTML = html;
-    }
-
-    function changeMonth(delta) {
-        calMonth.setMonth(calMonth.getMonth() + delta);
-        renderCalendar();
-    }
-
-    function renderAchievements() {
-        const totalProfit = sum(userProfits);
-        const count = userProfits.length;
-        
-        // Recalculate streak logic strictly
-        const profitDates = [...new Set(userProfits.map(p => new Date(p.created_at).toDateString()))].map(d => new Date(d)).sort((a,b) => b-a);
-        let maxStreak = 0, curStreak = 0, lastDate = null;
-        
-        if (profitDates.length > 0) {
-            curStreak = 1;
-            lastDate = profitDates[0];
-            maxStreak = 1;
-            
-            for (let i = 1; i < profitDates.length; i++) {
-                const diff = (lastDate - profitDates[i]) / (1000 * 60 * 60 * 24);
-                if (diff === 1) {
-                    curStreak++;
-                } else {
-                    curStreak = 1;
+            if(state.charts.profile) state.charts.profile.destroy();
+            state.charts.profile = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.reverse(),
+                    datasets: [{
+                        label: 'Профит',
+                        data: Object.values(historyMap).reverse(),
+                        borderColor: '#2AABEE',
+                        backgroundColor: 'rgba(42, 171, 238, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, border: {display: false}, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
                 }
-                if (curStreak > maxStreak) maxStreak = curStreak;
-                lastDate = profitDates[i];
-            }
+            });
         }
 
-        let html = `<div class="ach-grid" style="margin-top: 16px;">`;
-        
-        ACHIEVEMENTS.forEach(ach => {
-            let progress = 0;
-            if (ach.isMoney) progress = Math.min(100, (totalProfit / ach.target) * 100);
-            else if (ach.isStreak) progress = Math.min(100, (maxStreak / ach.target) * 100);
-            else progress = Math.min(100, (count / ach.target) * 100);
-            
-            const isDone = progress >= 100;
-            
-            html += `
-                <div class="ach-card ${isDone ? '' : 'locked'}">
-                    <div class="ach-icon ${isDone ? 'done' : 'locked'}">${ach.icon}</div>
-                    <div class="ach-title">${ach.title}</div>
-                    <div class="ach-desc">${ach.desc}</div>
-                    <div class="ach-progress">
-                        <div class="ach-fill" style="width: ${progress}%"></div>
-                    </div>
-                    <div class="ach-status ${isDone ? 'done' : 'progress'}">
-                        ${isDone ? 'Выполнено' : Math.round(progress) + '%'}
-                    </div>
-                </div>
-            `;
-        });
-        
-        html += `</div>`;
-        document.getElementById('achievements').innerHTML = html;
-    }
+        function renderPieChart(allProfits) {
+            const ctx = document.getElementById('pieChart');
+            const map = {};
+            allProfits.forEach(p => map[p.service_name] = (map[p.service_name]||0) + Number(p.amount));
+            const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,5);
 
-    // Start
-    window.onload = load;
-</script>
+            if(state.charts.pie) state.charts.pie.destroy();
+            state.charts.pie = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sorted.map(x=>x[0]),
+                    datasets: [{
+                        data: sorted.map(x=>x[1]),
+                        backgroundColor: ['#2AABEE', '#34C759', '#FF9500', '#FF3B30', '#AF52DE'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, font: {size: 11} } } 
+                    }
+                }
+            });
+        }
+
+        // --- NAVIGATION ---
+        window.switchView = (viewName, btn) => {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-'+viewName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        // Start
+        window.onload = init;
+
+    </script>
+</body>
 </html>
