@@ -151,7 +151,7 @@
     .streak-lbl { font-size: 14px; opacity: 0.9; margin-top: 2px; }
 
     /* Achievements */
-    .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
+    .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
     .ach-card { background: var(--bg); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); }
     .ach-card.locked { opacity: 0.6; }
     .ach-icon { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
@@ -240,9 +240,7 @@
         return Math.round(n) + ' ₽';
     };
     
-    // --- ИЗМЕНЕНИЕ: Используем p.amount вместо p.net_profit ---
     const sum = arr => arr.reduce((a,b) => a + (parseFloat(b.amount)||parseFloat(b.net_profit)||0), 0);
-    // -----------------------------------------------------------
 
     const isSameDay = (d1, d2) => d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
     const getPlural = (n, forms) => {
@@ -289,9 +287,11 @@
     async function load() {
         if (!db) { document.getElementById('loader').classList.add('hidden'); return; }
         
+        // !!! ИСПРАВЛЕНИЕ ЗДЕСЬ !!!
+        // Добавлен range, чтобы загружать больше 1000 строк
         const [pRes, uRes] = await Promise.all([
-            db.from('profits').select('*').order('created_at', {ascending: false}),
-            db.from('users').select('*').eq('status', 'active')
+            db.from('profits').select('*').order('created_at', {ascending: false}).range(0, 20000),
+            db.from('users').select('*').eq('status', 'active').range(0, 10000)
         ]);
         
         allProfits = pRes.data || [];
@@ -334,7 +334,7 @@
         const myTotal = sum(userProfits);
         const myToday = sum(userProfits.filter(p => isSameDay(new Date(p.created_at), new Date())));
         
-        // Calculate rank (Исправлено на полную сумму)
+        // Calculate rank
         const userMap = {};
         allProfits.forEach(p => userMap[p.worker_id] = (userMap[p.worker_id]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
         const rank = Object.entries(userMap).sort((a,b) => b[1]-a[1]).findIndex(x => x[0] == userId) + 1;
@@ -352,7 +352,7 @@
             teamChartData.push(sum(allProfits.filter(p => isSameDay(new Date(p.created_at), d))));
         }
         
-        // Service breakdown for pie chart (Исправлено на полную сумму)
+        // Service breakdown for pie chart
         const serviceMap = {};
         userProfits.forEach(p => serviceMap[p.service_name] = (serviceMap[p.service_name]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
         const serviceData = Object.entries(serviceMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
@@ -519,7 +519,6 @@
         else if (lbFilter === 'week') data = data.filter(p => new Date(p.created_at) >= new Date(now.getTime() - 7*24*60*60*1000));
         else if (lbFilter === 'day') data = data.filter(p => isSameDay(new Date(p.created_at), now));
         
-        // Использование p.amount вместо net_profit
         const totals = {};
         data.forEach(p => totals[p.worker_id] = (totals[p.worker_id]||0) + (parseFloat(p.amount)||parseFloat(p.net_profit)||0));
         const sorted = Object.entries(totals)
@@ -535,41 +534,32 @@
                     <div class="card-header">
                         <div class="card-title">${ICONS.trophy} Рейтинг воркеров</div>
                         <select class="filter-select" onchange="lbFilter=this.value;renderLeaderboard()">
-                            ${Object.entries(filterLabels).map(([k,v]) => `<option value="${k}" ${lbFilter===k?'selected':''}>${v}</option>`).join('')}
+                            <option value="all" ${lbFilter=='all'?'selected':''}>Всё время</option>
+                            <option value="month" ${lbFilter=='month'?'selected':''}>Месяц</option>
+                            <option value="week" ${lbFilter=='week'?'selected':''}>Неделя</option>
+                            <option value="day" ${lbFilter=='day'?'selected':''}>Сегодня</option>
                         </select>
                     </div>
-                    <div class="list">
-        `;
-
+                    <div class="list">`;
+        
         if (sorted.length === 0) {
-            html += `
-                <div class="empty">
-                    <div class="empty-icon">${ICONS.chart}</div>
-                    <div class="empty-title">Пусто</div>
-                    <div class="empty-text">Пока нет данных за выбранный период</div>
-                </div>
-            `;
+            html += `<div class="empty"><div class="empty-text">Нет данных</div></div>`;
         } else {
             sorted.forEach((item, idx) => {
                 const rank = idx + 1;
-                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const rClass = rank <= 3 ? `rank-${rank}` : '';
                 const u = item.user;
                 const name = u?.full_name || 'Неизвестный';
                 const avatar = u?.photo_url 
-                    ? `<img src="${u.photo_url}" alt="">` 
+                    ? `<img src="${u.photo_url}">` 
                     : getInitials(name);
                 
-                // Рендер аватара (текст или картинка)
-                const avatarContent = u?.photo_url 
-                    ? `<img src="${u.photo_url}" alt="">` 
-                    : `<div style="background:${getAvatarColor(item.id)};width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${avatar}</div>`;
-
                 html += `
                     <div class="list-item">
-                        <div class="rank-badge ${rankClass}">${rank}</div>
-                        <div class="avatar">${avatarContent}</div>
+                        <div class="rank-badge ${rClass}">${rank}</div>
+                        <div class="avatar">${avatar}</div>
                         <div class="user-info">
-                            <div class="user-name">${name} ${item.id == userId ? '<span class="user-badge">Вы</span>' : ''}</div>
+                            <div class="user-name">${name} ${rank===1 ? '👑':''}</div>
                             <div class="user-sub">${fmtShort(item.val)}</div>
                         </div>
                     </div>
@@ -582,32 +572,133 @@
     }
 
     function renderCalendar() {
-        // Простой календарь для заполнения контента
-        document.getElementById('calendar').innerHTML = `
-             <div class="section" style="margin-top: 16px;">
-                <div class="empty">
-                    <div class="empty-icon">${ICONS.calendar}</div>
-                    <div class="empty-title">Календарь</div>
-                    <div class="empty-text">Функция календаря в разработке</div>
+        const y = calMonth.getFullYear(), m = calMonth.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+        
+        // Calculate daily profits
+        const daily = {};
+        userProfits.forEach(p => {
+            const d = new Date(p.created_at);
+            if (d.getMonth() === m && d.getFullYear() === y) {
+                const day = d.getDate();
+                daily[day] = (daily[day] || 0) + (parseFloat(p.amount) || parseFloat(p.net_profit) || 0);
+            }
+        });
+        
+        let html = `
+            <div class="cal-card">
+                <div class="cal-nav">
+                    <button class="cal-btn" onclick="changeMonth(-1)">${ICONS.chevronLeft}</button>
+                    <div class="cal-title">${monthNames[m]} ${y}</div>
+                    <button class="cal-btn" onclick="changeMonth(1)">${ICONS.chevronRight}</button>
+                </div>
+                <div class="cal-grid">
+                    ${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => `<div class="cal-head">${d}</div>`).join('')}
+        `;
+        
+        const offset = firstDay === 0 ? 6 : firstDay - 1;
+        for (let i = 0; i < offset; i++) html += `<div class="cal-day empty"></div>`;
+        
+        const maxVal = Math.max(...Object.values(daily), 1);
+        const today = new Date();
+        
+        for (let d = 1; d <= daysInMonth; d++) {
+            const val = daily[d] || 0;
+            let cls = 'cal-day';
+            if (val > 0) cls += ' profit';
+            if (val > maxVal * 0.7) cls += ' high';
+            if (isSameDay(new Date(y, m, d), today)) cls += ' today';
+            
+            html += `<div class="${cls}">${d}</div>`;
+        }
+        
+        html += `</div></div>`;
+        
+        // Streak calculation
+        let streak = 0;
+        let tempDate = new Date();
+        while (true) {
+            const hasProfit = userProfits.some(p => isSameDay(new Date(p.created_at), tempDate));
+            if (hasProfit) streak++;
+            else if (!isSameDay(tempDate, new Date())) break; 
+            tempDate.setDate(tempDate.getDate() - 1);
+        }
+
+        html += `
+            <div class="streak-card">
+                <div class="streak-icon">${ICONS.fire}</div>
+                <div class="streak-content">
+                    <div class="streak-val">${streak} ${getPlural(streak, ['день','дня','дней'])}</div>
+                    <div class="streak-lbl">Текущая серия профитов</div>
                 </div>
             </div>
         `;
+
+        document.getElementById('calendar').innerHTML = html;
+    }
+
+    function changeMonth(delta) {
+        calMonth.setMonth(calMonth.getMonth() + delta);
+        renderCalendar();
     }
 
     function renderAchievements() {
-        // Простые ачивки для заполнения контента
-        document.getElementById('achievements').innerHTML = `
-             <div class="section" style="margin-top: 16px;">
-                <div class="empty">
-                    <div class="empty-icon">${ICONS.target}</div>
-                    <div class="empty-title">Достижения</div>
-                    <div class="empty-text">Система достижений обновляется</div>
+        const totalProfit = sum(userProfits);
+        const count = userProfits.length;
+        
+        // Recalculate streak logic strictly
+        const profitDates = [...new Set(userProfits.map(p => new Date(p.created_at).toDateString()))].map(d => new Date(d)).sort((a,b) => b-a);
+        let maxStreak = 0, curStreak = 0, lastDate = null;
+        
+        if (profitDates.length > 0) {
+            curStreak = 1;
+            lastDate = profitDates[0];
+            maxStreak = 1;
+            
+            for (let i = 1; i < profitDates.length; i++) {
+                const diff = (lastDate - profitDates[i]) / (1000 * 60 * 60 * 24);
+                if (diff === 1) {
+                    curStreak++;
+                } else {
+                    curStreak = 1;
+                }
+                if (curStreak > maxStreak) maxStreak = curStreak;
+                lastDate = profitDates[i];
+            }
+        }
+
+        let html = `<div class="ach-grid" style="margin-top: 16px;">`;
+        
+        ACHIEVEMENTS.forEach(ach => {
+            let progress = 0;
+            if (ach.isMoney) progress = Math.min(100, (totalProfit / ach.target) * 100);
+            else if (ach.isStreak) progress = Math.min(100, (maxStreak / ach.target) * 100);
+            else progress = Math.min(100, (count / ach.target) * 100);
+            
+            const isDone = progress >= 100;
+            
+            html += `
+                <div class="ach-card ${isDone ? '' : 'locked'}">
+                    <div class="ach-icon ${isDone ? 'done' : 'locked'}">${ach.icon}</div>
+                    <div class="ach-title">${ach.title}</div>
+                    <div class="ach-desc">${ach.desc}</div>
+                    <div class="ach-progress">
+                        <div class="ach-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="ach-status ${isDone ? 'done' : 'progress'}">
+                        ${isDone ? 'Выполнено' : Math.round(progress) + '%'}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        });
+        
+        html += `</div>`;
+        document.getElementById('achievements').innerHTML = html;
     }
 
-    // Запуск
-    load();
+    // Start
+    window.onload = load;
 </script>
 </html>
