@@ -45,6 +45,7 @@
     <div id="calendar" class="tab-content"></div>
     <div id="achievements" class="tab-content"></div>
     <div class="loader" id="loader"><div class="spinner"></div><div class="loader-text">Загрузка данных...</div></div>
+    <div id="load-error" class="load-error hidden"></div>
 </body>
 </html>
 
@@ -194,6 +195,12 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loader-text { font-size: 14px; color: var(--hint); font-weight: 500; }
     
+    .load-error { margin: 20px 16px; padding: 20px; background: var(--bg-card); border: 1px solid var(--red); border-radius: var(--radius); }
+    .load-error.hidden { display: none; }
+    .load-error-title { font-size: 16px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    .load-error-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .load-error-detail { font-size: 12px; color: var(--hint); margin-top: 12px; word-break: break-all; }
+    
     /* Empty State */
     .empty { text-align: center; padding: 60px 20px; }
     .empty-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -285,6 +292,14 @@
     const getInitials = name => (name || 'U').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
     const escapeHtml = s => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     
+    function showLoadError(msg, detail) {
+        const el = document.getElementById('load-error');
+        if (!el) return;
+        el.innerHTML = '<div class="load-error-title">Не удалось загрузить данные</div><div class="load-error-text">' + escapeHtml(msg) + '</div>' + (detail ? '<div class="load-error-detail">' + escapeHtml(detail) + '</div>' : '');
+        el.classList.remove('hidden');
+        if (detail) console.error('Analytics load error:', detail);
+    }
+    
     const ACHIEVEMENTS = [
         { id: 'first', title: 'Первый старт', desc: 'Первый профит', target: 1, icon: '🚀' },
         { id: 'p10', title: 'Десятка', desc: '10 профитов', target: 10, icon: '🎯' },
@@ -318,17 +333,37 @@
 
 <script>
     async function load() {
-        if (!db) { document.getElementById('loader').classList.add('hidden'); return; }
+        const loaderEl = document.getElementById('loader');
+        const errorEl = document.getElementById('load-error');
+        if (!db) {
+            loaderEl.classList.add('hidden');
+            if (errorEl) { showLoadError('Supabase не подключён. Проверьте загрузку скрипта.', ''); }
+            return;
+        }
         
         const [pRes, uRes] = await Promise.all([
             db.from('profits').select('*').order('created_at', {ascending: false}),
             db.from('users').select('*').eq('status', 'active')
         ]);
         
+        if (pRes.error || uRes.error) {
+            loaderEl.classList.add('hidden');
+            const err = pRes.error || uRes.error;
+            const code = err.code || '';
+            const msg = err.message || String(err);
+            const hint = (code === 'PGRST301' || /permission|policy|row level|RLS/i.test(msg))
+                ? 'В Supabase включён RLS: для таблиц profits и users нужны политики SELECT для роли anon (или отключите RLS для этих таблиц в дашборде).'
+                : '';
+            showLoadError(msg, hint || (code ? code + ': ' + msg : null));
+            return;
+        }
+        
         allProfits = pRes.data || [];
         allUsers = uRes.data || [];
         userProfits = userId ? allProfits.filter(p => p.worker_id == userId) : [];
         currentUser = userId ? allUsers.find(u => u.id == userId) : null;
+        
+        if (errorEl) errorEl.classList.add('hidden');
         
         const displayName = getDisplayName(currentUser);
         const usernameDisplay = getUsernameDisplay(currentUser);
@@ -345,7 +380,7 @@
             </div>
         `;
         
-        document.getElementById('loader').classList.add('hidden');
+        loaderEl.classList.add('hidden');
         renderAll();
     }
     
