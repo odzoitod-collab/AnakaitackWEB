@@ -4,131 +4,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IRL Team • Analytics Pro</title>
+    <title>IRL Team • Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg: #ffffff;
-            --bg-sec: #f4f4f5;
-            --text: #000000;
-            --hint: #8e8e93;
-            --accent: #2AABEE;
-            --accent-gradient: linear-gradient(135deg, #2AABEE 0%, #0077ff 100%);
-            --card-bg: #ffffff;
-            --shadow: 0 4px 12px rgba(0,0,0,0.06);
-            --radius: 20px;
-            --green: #34C759;
-            --red: #FF3B30;
-            --orange: #FF9500;
-        }
-
-        /* Dark mode */
-        body.dark-mode {
-            --bg: #1c1c1e;
-            --bg-sec: #000000;
-            --text: #ffffff;
-            --hint: #aeaeb2;
-            --card-bg: #2c2c2e;
-            --shadow: 0 4px 12px rgba(0,0,0,0.2);
+            --bg: #0a0a0c;
+            --bg-sec: #060608;
+            --text: #e8e8ec;
+            --hint: #7a7a85;
+            --accent: #b8b8c8;
+            --accent-bright: #d4af37;
+            --metal: linear-gradient(145deg, #2a2a30 0%, #1a1a1e 50%, #0e0e10 100%);
+            --metal-border: 1px solid rgba(184, 184, 200, 0.12);
+            --metal-shine: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%);
+            --card-bg: #121216;
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --radius: 16px;
+            --green: #4ade80;
+            --red: #f87171;
+            --orange: #fb923c;
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Exo 2', -apple-system, sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--bg-sec); color: var(--text); padding-bottom: 90px; min-height: 100vh; transition: background 0.2s; -webkit-font-smoothing: antialiased; }
+        body { font-family: var(--font-body); background: var(--bg-sec); color: var(--text); padding-bottom: 90px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
         
-        /* Icons */
         .icon { width: 20px; height: 20px; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
         .icon-sm { width: 16px; height: 16px; }
         .icon-lg { width: 24px; height: 24px; }
 
-        /* Header */
-        .header { background: var(--card-bg); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
-        .header-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--hint); flex-shrink: 0; border: 1px solid rgba(0,0,0,0.05); }
+        .header { background: var(--card-bg); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50; border-bottom: var(--metal-border); }
+        .header-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--hint); flex-shrink: 0; border: 2px solid rgba(184,184,200,0.2); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3); }
         .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .header-info { flex: 1; min-width: 0; }
-        .header-name { font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .header-role { font-size: 12px; color: var(--hint); display: flex; align-items: center; gap: 6px; }
+        .header-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+        .header-role { font-size: 11px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.08em; }
         
-        /* Navigation */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 6px 30px; border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); font-size: 10px; font-weight: 500; padding: 4px 12px; border-radius: 12px; transition: 0.2s; border: none; background: none; cursor: pointer; width: 64px; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,12,0.95); display: flex; justify-content: space-around; padding: 10px 6px 30px; border-top: var(--metal-border); z-index: 100; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); font-size: 10px; font-weight: 600; padding: 4px 12px; border-radius: 12px; transition: 0.2s; border: none; background: none; cursor: pointer; width: 64px; font-family: var(--font-body); }
         .nav-item svg { width: 24px; height: 24px; transition: 0.2s; }
-        .nav-item.active { color: var(--accent); }
-        .nav-item.active svg { transform: translateY(-2px); }
+        .nav-item.active { color: var(--accent-bright); text-shadow: 0 0 20px rgba(212,175,55,0.3); }
+        .nav-item.active svg { transform: translateY(-2px); stroke: var(--accent-bright); }
 
         /* Views */
         .view { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Components */
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-        .hero-card { background: var(--accent-gradient); color: #fff; padding: 24px; }
-        .hero-card .label { opacity: 0.85; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        .hero-card .value { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin: 4px 0 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; border: var(--metal-border); }
+        .card::before { content: ''; position: absolute; inset: 0; background: var(--metal-shine); pointer-events: none; border-radius: inherit; }
+        .hero-card { background: var(--metal); color: var(--text); padding: 24px; border: 1px solid rgba(212,175,55,0.25); box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03); }
+        .hero-card .label { color: var(--hint); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; }
+        .hero-card .value { font-family: var(--font-display); font-size: 36px; font-weight: 900; letter-spacing: 0.02em; margin: 8px 0 20px; color: var(--accent-bright); text-shadow: 0 0 30px rgba(212,175,55,0.2); }
         
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .mini-stat { background: rgba(255,255,255,0.2); border-radius: 16px; padding: 14px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; }
-        .mini-stat-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; opacity: 0.9; font-size: 12px; font-weight: 500; }
-        .mini-stat .v { font-size: 18px; font-weight: 700; line-height: 1.2; }
+        .mini-stat { background: rgba(0,0,0,0.3); border-radius: 14px; padding: 14px; border: var(--metal-border); display: flex; flex-direction: column; justify-content: space-between; }
+        .mini-stat-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: var(--hint); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .mini-stat .v { font-family: var(--font-display); font-size: 17px; font-weight: 700; line-height: 1.2; color: var(--text); }
 
-        .section-title { font-size: 19px; font-weight: 700; margin: 24px 4px 12px; display: flex; align-items: center; justify-content: space-between; letter-spacing: -0.3px; }
+        .section-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin: 24px 4px 12px; display: flex; align-items: center; justify-content: space-between; letter-spacing: 0.08em; color: var(--text); text-transform: uppercase; }
         
         .chart-wrapper { height: 220px; width: 100%; position: relative; margin-top: 10px; }
         
         /* Leaderboard */
         .search-box { position: sticky; top: 0; background: var(--bg-sec); padding: 0 0 12px; z-index: 10; }
         .search-inner { position: relative; }
-        .search-input { width: 100%; background: var(--card-bg); border: none; padding: 14px 44px 14px 16px; border-radius: 16px; font-size: 15px; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; -webkit-appearance: none; }
-        .search-input:focus { box-shadow: 0 4px 12px rgba(42, 171, 238, 0.2); }
+        .search-input { width: 100%; background: var(--card-bg); border: var(--metal-border); padding: 14px 44px 14px 16px; border-radius: 14px; font-size: 15px; color: var(--text); transition: 0.2s; -webkit-appearance: none; }
+        .search-input:focus { border-color: rgba(212,175,55,0.4); box-shadow: 0 0 0 2px rgba(212,175,55,0.1); }
         .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--hint); pointer-events: none; display: flex; }
 
-        .user-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card-bg); border-radius: 18px; margin-bottom: 8px; transition: transform 0.1s; cursor: pointer; border: 1px solid transparent; }
-        .user-row:active { transform: scale(0.98); background: var(--bg-sec); }
+        .user-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card-bg); border-radius: 14px; margin-bottom: 8px; transition: transform 0.1s; cursor: pointer; border: var(--metal-border); }
+        .user-row:active { transform: scale(0.98); border-color: rgba(212,175,55,0.2); }
         
-        .rank { width: 28px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--hint); font-size: 14px; }
-        .rank-icon { width: 24px; height: 24px; }
-        .rank-1 { color: #FFD700; }
-        .rank-2 { color: #C0C0C0; }
-        .rank-3 { color: #CD7F32; }
+        .rank { width: 36px; min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--hint); font-size: 13px; font-family: var(--font-display); flex-shrink: 0; }
+        .rank svg.rank-icon { width: 28px; height: 28px; display: block; flex-shrink: 0; }
+        .rank-icon.rank-1 { color: #d4af37; filter: drop-shadow(0 1px 3px rgba(212,175,55,0.4)); }
+        .rank-icon.rank-2 { color: #b0b0b8; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25)); }
+        .rank-icon.rank-3 { color: #b87333; filter: drop-shadow(0 1px 3px rgba(184,115,51,0.35)); }
         
-        .u-avatar { width: 42px; height: 42px; border-radius: 14px; background: var(--bg-sec); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--hint); }
-        .u-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .u-info { flex: 1; min-width: 0; }
         .u-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
         .u-tag { font-size: 12px; color: var(--hint); }
-        .u-amount { font-weight: 700; font-size: 15px; color: var(--accent); white-space: nowrap; }
+        .u-amount { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--accent-bright); white-space: nowrap; letter-spacing: 0.02em; }
 
-        /* History */
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: var(--metal-border); }
         .history-item:last-child { border-bottom: none; }
         .h-left { display: flex; gap: 14px; align-items: center; }
-        .h-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(42, 171, 238, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+        .h-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(212,175,55,0.08); color: var(--accent-bright); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212,175,55,0.15); }
         .h-meta { display: flex; flex-direction: column; gap: 2px; }
-        .h-service { font-weight: 600; font-size: 15px; }
+        .h-service { font-weight: 600; font-size: 15px; color: var(--text); }
         .h-date { font-size: 12px; color: var(--hint); }
         .h-right { text-align: right; }
-        .h-amount { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+        .h-amount { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.02em; color: var(--green); }
         .h-user { font-size: 12px; color: var(--hint); font-weight: 500; }
 
         /* Profile Bottom Sheet */
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(2px); }
         .sheet-overlay.open { opacity: 1; pointer-events: auto; }
-        .sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-sec); border-radius: 24px 24px 0 0; z-index: 201; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 24px 24px 0 0; z-index: 201; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); height: 90vh; overflow-y: auto; display: flex; flex-direction: column; border: 1px solid rgba(184,184,200,0.12); border-bottom: none; box-shadow: 0 -8px 32px rgba(0,0,0,0.5); }
         .sheet.open { transform: translateY(0); }
         .sheet-header { padding: 8px; display: flex; justify-content: center; position: sticky; top: 0; background: var(--bg-sec); z-index: 10; }
         .sheet-handle { width: 40px; height: 5px; background: var(--hint); opacity: 0.3; border-radius: 10px; margin: 8px 0; }
         .sheet-close { position: absolute; right: 16px; top: 16px; background: rgba(128,128,128,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: 0.2s; }
         .sheet-close:active { background: rgba(128,128,128,0.2); }
 
-        .profile-stat-box { background: var(--bg-sec); padding: 16px; border-radius: 20px; display: flex; align-items: center; gap: 12px; }
-        .stat-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(42, 171, 238, 0.15); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+        .profile-hero .p-name { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--text); margin-bottom: 4px; }
+        .profile-hero .p-tag { color: var(--hint); font-size: 14px; font-weight: 500; }
+        .profile-stat-box { background: rgba(0,0,0,0.3); padding: 16px; border-radius: 14px; display: flex; align-items: center; gap: 12px; border: var(--metal-border); }
+        .stat-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(212,175,55,0.1); color: var(--accent-bright); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212,175,55,0.2); }
 
-        /* Loader */
         .loader { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: opacity 0.3s; }
-        .spinner { width: 40px; height: 40px; border: 3px solid var(--bg-sec); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 44px; height: 44px; border: 3px solid var(--card-bg); border-top-color: var(--accent-bright); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .filter-chip { background: var(--card-bg); color: var(--hint); border: var(--metal-border); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; font-family: var(--font-body); cursor: pointer; transition: 0.2s; }
+        .filter-chip.active { background: linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%) !important; color: var(--accent-bright) !important; border: 1px solid rgba(212,175,55,0.3); }
 
     </style>
 </head>
@@ -207,9 +203,9 @@
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch;">
-            <button class="filter-chip active" onclick="setLbFilter('all', this)" style="background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Все время</button>
-            <button class="filter-chip" onclick="setLbFilter('month', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Месяц</button>
-            <button class="filter-chip" onclick="setLbFilter('day', this)" style="background: var(--card-bg); color: var(--hint); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">Сегодня</button>
+            <button class="filter-chip active" onclick="setLbFilter('all', this)">Все время</button>
+            <button class="filter-chip" onclick="setLbFilter('month', this)">Месяц</button>
+            <button class="filter-chip" onclick="setLbFilter('day', this)">Сегодня</button>
         </div>
 
         <div id="leaderboardList"></div>
@@ -231,12 +227,10 @@
             </button>
         </div>
         <div style="padding: 0 16px 40px;">
-            <div class="card" style="text-align: center; padding: 30px 20px; background: var(--card-bg); box-shadow: none; border: 1px solid rgba(0,0,0,0.05); margin-bottom: 8px;">
-                <div id="p-avatar" style="width: 86px; height: 86px; margin: 0 auto 16px; border-radius: 24px; background: var(--bg-sec); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: var(--hint); overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08);"></div>
-                <div id="p-name" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Name</div>
-                <div id="p-tag" style="color: var(--accent); font-size: 15px; margin-bottom: 20px; font-weight: 500;">@tag</div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="card profile-hero" style="text-align: center; padding: 24px 20px; margin-bottom: 12px;">
+                <div id="p-name" class="p-name">Name</div>
+                <div id="p-tag" class="p-tag">@tag</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
                     <div class="profile-stat-box">
                         <div class="stat-icon">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
@@ -305,7 +299,7 @@
         if(tg) {
             tg.ready();
             tg.expand();
-            if(tg.colorScheme === 'dark') document.body.classList.add('dark-mode');
+            tg.setHeaderColor('#0a0a0c'); tg.setBackgroundColor('#060608');
         }
 
         // --- STATE ---
@@ -323,11 +317,32 @@
         // --- HELPERS ---
         const fmtMoney = n => new Intl.NumberFormat('ru-RU').format(Math.floor(Number(n))) + ' ₽';
         const getInitials = n => (n||'??').replace(/[^a-zA-Zа-яА-Я ]/g, "").split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        function toMoscowDate(isoStr) {
+            const d = new Date(isoStr);
+            return d.toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        function toMoscowDateKey(isoStr) {
+            const d = new Date(isoStr);
+            const y = d.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', year: 'numeric' });
+            const m = d.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', month: '2-digit' });
+            const day = d.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', day: '2-digit' });
+            return day + '.' + m + '.' + y;
+        }
+        function getTodayMoscow() {
+            return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Moscow' });
+        }
+        function getMoscowDayStart(isoStr) {
+            const d = new Date(isoStr);
+            const s = d.toLocaleString('en-CA', { timeZone: 'Europe/Moscow' });
+            return s.slice(0, 10);
+        }
         const formatDate = dStr => {
             const d = new Date(dStr);
-            const now = new Date();
-            if(d.toDateString() === now.toDateString()) return `Сегодня, ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-            return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+            const todayMoscow = getTodayMoscow();
+            const dayMoscow = getMoscowDayStart(dStr);
+            const time = d.toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
+            if (dayMoscow === todayMoscow) return `Сегодня, ${time}`;
+            return toMoscowDate(dStr) + ', ' + time;
         };
 
         const getUserName = (u, id) => {
@@ -383,14 +398,16 @@
         function renderApp() {
             const myUser = state.userMap[state.userId] || { full_name: state.userName, photo_url: state.userPhoto };
             const myName = getUserName(myUser, state.userId);
+            const avatarUrl = state.userPhoto || myUser.photo_url;
             
             document.getElementById('myName').innerText = myName;
             document.getElementById('myStatus').innerText = (myUser.status || 'active').toUpperCase();
-            document.getElementById('myAvatar').innerHTML = getAvatarHTML(myUser.photo_url, myName);
+            document.getElementById('myAvatar').innerHTML = getAvatarHTML(avatarUrl, myName);
             
             const total = state.profits.reduce((acc, p) => acc + Number(p.amount), 0);
+            const todayMoscow = getTodayMoscow();
             const today = state.profits
-                .filter(p => new Date(p.created_at).toDateString() === new Date().toDateString())
+                .filter(p => getMoscowDayStart(p.created_at) === todayMoscow)
                 .reduce((acc, p) => acc + Number(p.amount), 0);
             const maxP = state.profits.reduce((max, p) => Math.max(max, Number(p.amount)), 0);
 
@@ -410,27 +427,26 @@
 
         function setLbFilter(filter, btn) {
             state.lbFilter = filter;
-            document.querySelectorAll('.filter-chip').forEach(b => {
-                b.style.background = 'var(--card-bg)';
-                b.style.color = 'var(--hint)';
-            });
-            btn.style.background = 'var(--accent)';
-            btn.style.color = 'white';
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             renderLeaderboard();
         }
 
         function renderLeaderboard() {
             const container = document.getElementById('leaderboardList');
             const term = searchInput.value.toLowerCase().trim();
-            const now = new Date();
 
+            const todayMoscow = getTodayMoscow();
+            const monthMoscow = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', month: '2-digit', year: 'numeric' });
             const agg = {};
             state.profits.forEach(p => {
-                const pDate = new Date(p.created_at);
+                const dayKey = getMoscowDayStart(p.created_at);
                 let pass = true;
-                if (state.lbFilter === 'month' && (pDate.getMonth() !== now.getMonth() || pDate.getFullYear() !== now.getFullYear())) pass = false;
-                if (state.lbFilter === 'day' && pDate.toDateString() !== now.toDateString()) pass = false;
-
+                if (state.lbFilter === 'month') {
+                    const pMonth = new Date(p.created_at).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', month: '2-digit', year: 'numeric' });
+                    if (pMonth !== monthMoscow) pass = false;
+                }
+                if (state.lbFilter === 'day' && dayKey !== todayMoscow) pass = false;
                 if (pass) {
                     if (!agg[p.worker_id]) agg[p.worker_id] = 0;
                     agg[p.worker_id] += Number(p.amount);
@@ -460,25 +476,22 @@
                 const u = item.user;
                 const id = item.id;
                 
-                let rankDisplay = `<span style="opacity:0.7">#${rank}</span>`;
-                // SVG кубки для топ 3
+                let rankDisplay = `<span style="opacity:0.75">#${rank}</span>`;
                 if (state.lbFilter === 'all' && !term) {
-                    if(rank === 1) rankDisplay = `<svg class="rank-icon rank-1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15c-1.66 0-3-1.34-3-3V6h6v6c0 1.66-1.34 3-3 3z"></path><path d="M20 2h-4v2h4v2h-2v2h2v4.29c0 1.96-1.09 3.73-2.74 4.79L15 18.25v1.75h2v2H7v-2h2v-1.75l-2.26-1.21C5.09 16.02 4 14.25 4 12.29V8h2V6H4V4h4V2H2v6h2v4.29c0 1.25.68 2.39 1.73 3.06L8 16.73v1.27h8v-1.27l2.27-1.38C19.32 14.68 20 13.54 20 12.29V8h2V2h-2z" fill="none"></path><path d="M18 4v2h2V4h-2zm-14 2V4h2v2H4zm13.26 11.21L15 16.43V6h-6v10.43l-2.26-1.22c-1.05-.67-1.73-1.81-1.73-3.06V8h2V6H4V4H2v6h2v4.29c0 1.96 1.09 3.73 2.74 4.79L9 20.5v1.5h6v-1.5l2.26-1.42c1.65-1.06 2.74-2.83 2.74-4.79V8h-2v2h2v4.15c0 1.25-.68 2.39-1.73 3.06z"></path></svg>`;
-                    if(rank === 2) rankDisplay = `<svg class="rank-icon rank-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15c-1.66 0-3-1.34-3-3V6h6v6c0 1.66-1.34 3-3 3z"></path><path d="M20 2h-4v2h4v2h-2v2h2v4.29c0 1.96-1.09 3.73-2.74 4.79L15 18.25v1.75h2v2H7v-2h2v-1.75l-2.26-1.21C5.09 16.02 4 14.25 4 12.29V8h2V6H4V4h4V2H2v6h2v4.29c0 1.25.68 2.39 1.73 3.06L8 16.73v1.27h8v-1.27l2.27-1.38C19.32 14.68 20 13.54 20 12.29V8h2V2h-2z" fill="none"></path><path d="M18 4v2h2V4h-2zm-14 2V4h2v2H4zm13.26 11.21L15 16.43V6h-6v10.43l-2.26-1.22c-1.05-.67-1.73-1.81-1.73-3.06V8h2V6H4V4H2v6h2v4.29c0 1.96 1.09 3.73 2.74 4.79L9 20.5v1.5h6v-1.5l2.26-1.42c1.65-1.06 2.74-2.83 2.74-4.79V8h-2v2h2v4.15c0 1.25-.68 2.39-1.73 3.06z"></path></svg>`;
-                    if(rank === 3) rankDisplay = `<svg class="rank-icon rank-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15c-1.66 0-3-1.34-3-3V6h6v6c0 1.66-1.34 3-3 3z"></path><path d="M20 2h-4v2h4v2h-2v2h2v4.29c0 1.96-1.09 3.73-2.74 4.79L15 18.25v1.75h2v2H7v-2h2v-1.75l-2.26-1.21C5.09 16.02 4 14.25 4 12.29V8h2V6H4V4h4V2H2v6h2v4.29c0 1.25.68 2.39 1.73 3.06L8 16.73v1.27h8v-1.27l2.27-1.38C19.32 14.68 20 13.54 20 12.29V8h2V2h-2z" fill="none"></path><path d="M18 4v2h2V4h-2zm-14 2V4h2v2H4zm13.26 11.21L15 16.43V6h-6v10.43l-2.26-1.22c-1.05-.67-1.73-1.81-1.73-3.06V8h2V6H4V4H2v6h2v4.29c0 1.96 1.09 3.73 2.74 4.79L9 20.5v1.5h6v-1.5l2.26-1.42c1.65-1.06 2.74-2.83 2.74-4.79V8h-2v2h2v4.15c0 1.25-.68 2.39-1.73 3.06z"></path></svg>`;
+                    if (rank === 1) rankDisplay = `<svg class="rank-icon rank-1" viewBox="0 0 32 32" fill="currentColor"><path d="M16 4h-2v5H9v5c0 2.8 2.2 5 5 5h4c2.8 0 5-2.2 5-5V9h-5V4h-2zm0 12c-1.7 0-3-1.3-3-3v-2h6v2c0 1.7-1.3 3-3 3zm-3 4h6v1.5h-6zm1 2.5h4v1h-4z"/></svg>`;
+                    if (rank === 2) rankDisplay = `<svg class="rank-icon rank-2" viewBox="0 0 32 32"><circle cx="16" cy="14" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="16" cy="14" r="5" fill="currentColor"/><path d="M16 3v2.5M16 22.5V25M6 14H3.5M28.5 14H26M9.5 7.5L7.5 9.5M24.5 20.5l2 2M24.5 7.5l2-2M9.5 20.5l-2 2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
+                    if (rank === 3) rankDisplay = `<svg class="rank-icon rank-3" viewBox="0 0 32 32"><circle cx="16" cy="14" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="16" cy="14" r="5" fill="currentColor"/><path d="M16 3v2.5M16 22.5V25M6 14H3.5M28.5 14H26M9.5 7.5L7.5 9.5M24.5 20.5l2 2M24.5 7.5l2-2M9.5 20.5l-2 2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
                 }
                 
                 const displayName = getUserName(u, id);
-                const ava = getAvatarHTML(u?.photo_url, displayName);
                 const tag = u ? (u.username ? '@'+u.username : (u.user_tag ? '#'+u.user_tag : '')) : '';
                 
                 return `
                 <div class="user-row" onclick="openProfile('${id}')">
                     <div class="rank">${rankDisplay}</div>
-                    <div class="u-avatar">${ava}</div>
                     <div class="u-info">
                         <div class="u-name">${displayName}</div>
-                        <div class="u-tag">${tag}</div>
+                        <div class="u-tag">${tag || '—'}</div>
                     </div>
                     <div class="u-amount">${fmtMoney(item.total)}</div>
                 </div>
@@ -492,10 +505,6 @@
             const recent = state.profits.slice(0, 50);
             
             list.innerHTML = recent.map(p => {
-                const u = state.userMap[p.worker_id];
-                const displayName = getUserName(u, p.worker_id);
-                
-                // SVG иконка вместо буквы
                 const icon = `<svg class="icon-lg" viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`;
                 
                 return `
@@ -509,7 +518,6 @@
                     </div>
                     <div class="h-right">
                         <div class="h-amount" style="color:var(--green)">+${fmtMoney(p.amount)}</div>
-                        <div class="h-user">${displayName}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -528,8 +536,6 @@
             document.getElementById('p-tag').innerText = tag;
             document.getElementById('p-total').innerText = fmtMoney(total);
             document.getElementById('p-count').innerText = uProfits.length;
-            
-            document.getElementById('p-avatar').innerHTML = getAvatarHTML(u?.photo_url, displayName);
 
             // History
             document.getElementById('p-history').innerHTML = uProfits.slice(0, 20).map(p => `
@@ -559,58 +565,67 @@
             document.getElementById('profileSheet').classList.remove('open');
         }
 
-        // --- CHARTS ---
+        // --- CHARTS (все даты по Москве) ---
+        function getLast7DaysMoscow() {
+            const todayStr = getTodayMoscow();
+            const [y, m, d] = todayStr.split('-').map(Number);
+            const labels = [];
+            const dayKeys = [];
+            for (let i = 6; i >= 0; i--) {
+                const dayAgo = new Date(y, m - 1, d - i);
+                const key = dayAgo.getFullYear() + '-' + String(dayAgo.getMonth() + 1).padStart(2, '0') + '-' + String(dayAgo.getDate()).padStart(2, '0');
+                dayKeys.push(key);
+                labels.push(dayAgo.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: '2-digit' }));
+            }
+            return { labels, dayKeys };
+        }
+
         function renderTeamChart() {
             const ctx = document.getElementById('mainChart');
+            const { labels, dayKeys } = getLast7DaysMoscow();
             const days = {};
-            const labels = [];
-            
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const key = d.toLocaleDateString('ru-RU', {weekday:'short'});
-                days[key] = 0;
-                labels.push(key);
-            }
+            dayKeys.forEach(k => { days[k] = 0; });
 
             let weekTotal = 0;
             state.profits.forEach(p => {
-                const d = new Date(p.created_at);
-                const now = new Date();
-                const diffTime = Math.abs(now - d);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                
-                if(diffDays <= 7) {
-                    const k = d.toLocaleDateString('ru-RU', {weekday:'short'});
-                    if(days[k] !== undefined) {
-                        days[k] += Number(p.amount);
-                        weekTotal += Number(p.amount);
-                    }
+                const dayKey = getMoscowDayStart(p.created_at);
+                if (days.hasOwnProperty(dayKey)) {
+                    days[dayKey] += Number(p.amount);
+                    weekTotal += Number(p.amount);
                 }
             });
 
+            const values = dayKeys.map(k => days[k]);
             document.getElementById('chartTotal').innerText = fmtMoney(weekTotal);
 
-            if(state.charts.main) state.charts.main.destroy();
+            if (state.charts.main) state.charts.main.destroy();
+            const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, 'rgba(212,175,55,0.3)');
+            grad.addColorStop(1, 'rgba(212,175,55,0)');
             state.charts.main = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Профит',
-                        data: labels.map(l => days[l]),
-                        backgroundColor: '#2AABEE',
-                        borderRadius: 6,
-                        barThickness: 'flex',
-                        maxBarThickness: 30
+                        data: values,
+                        borderColor: '#d4af37',
+                        backgroundColor: grad,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#121216',
+                        pointBorderColor: '#d4af37',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#8e8e93', font: {size: 11} } }, 
-                        y: { display: false } 
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#7a7a85', font: { size: 11, family: 'Exo 2' }, maxTicksLimit: 7 } },
+                        y: { beginAtZero: true, border: { display: false }, grid: { color: 'rgba(184,184,200,0.08)' }, ticks: { color: '#7a7a85', font: { size: 10 } } }
                     }
                 }
             });
@@ -619,25 +634,27 @@
         function renderProfileChart(data) {
             const ctx = document.getElementById('profileChart');
             const historyMap = {};
-            
-            // Группируем по дням, чтобы график был чище
             data.forEach(p => {
-                const d = new Date(p.created_at);
-                // Формат DD.MM
-                const k = d.getDate() + '.' + (d.getMonth() + 1);
-                historyMap[k] = (historyMap[k]||0) + Number(p.amount);
+                const k = toMoscowDateKey(p.created_at);
+                historyMap[k] = (historyMap[k] || 0) + Number(p.amount);
             });
-            
-            // Берем последние 14 активных дней и разворачиваем
-            const labels = Object.keys(historyMap).reverse().slice(0, 14).reverse();
-            const values = Object.values(historyMap).reverse().slice(0, 14).reverse();
+            const sorted = Object.entries(historyMap).sort((a, b) => {
+                const [d1, m1, y1] = a[0].split('.').map(Number);
+                const [d2, m2, y2] = b[0].split('.').map(Number);
+                const t1 = new Date(y1, m1 - 1, d1).getTime();
+                const t2 = new Date(y2, m2 - 1, d2).getTime();
+                return t1 - t2;
+            });
+            const last14 = sorted.slice(-14);
+            const labels = last14.map(x => x[0]);
+            const values = last14.map(x => x[1]);
 
             if(state.charts.profile) state.charts.profile.destroy();
             
             // Создаем градиент
             const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
-            gradient.addColorStop(0, 'rgba(42, 171, 238, 0.4)');
-            gradient.addColorStop(1, 'rgba(42, 171, 238, 0)');
+            gradient.addColorStop(0, 'rgba(212,175,55,0.25)');
+            gradient.addColorStop(1, 'rgba(212,175,55,0)');
 
             state.charts.profile = new Chart(ctx, {
                 type: 'line',
@@ -645,13 +662,13 @@
                     labels: labels,
                     datasets: [{
                         data: values,
-                        borderColor: '#2AABEE',
+                        borderColor: '#d4af37',
                         backgroundColor: gradient,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 3,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#2AABEE',
+                        pointBackgroundColor: '#121216',
+                        pointBorderColor: '#d4af37',
                         pointBorderWidth: 2
                     }]
                 },
@@ -662,18 +679,9 @@
                     scales: {
                         x: { 
                             grid: { display: false }, 
-                            ticks: { 
-                                maxTicksLimit: 6, // Ограничиваем кол-во подписей, чтобы влезало
-                                color: '#8e8e93',
-                                font: { size: 10 }
-                            } 
+                            ticks: { maxTicksLimit: 6, color: '#7a7a85', font: { size: 10, family: 'Exo 2' } } 
                         },
-                        y: { 
-                            beginAtZero: true, 
-                            border: {display: false}, 
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { display: false } // Скрываем цифры оси Y для чистоты
-                        }
+                        y: { beginAtZero: true, border: { display: false }, grid: { color: 'rgba(184,184,200,0.08)' }, ticks: { display: false } }
                     }
                 }
             });
@@ -692,8 +700,9 @@
                     labels: sorted.map(x=>x[0]),
                     datasets: [{
                         data: sorted.map(x=>x[1]),
-                        backgroundColor: ['#2AABEE', '#34C759', '#FF9500', '#FF3B30', '#AF52DE'],
-                        borderWidth: 0
+                        backgroundColor: ['#d4af37', '#4ade80', '#fb923c', '#f87171', '#a78bfa'],
+                        borderColor: '#121216',
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -701,7 +710,7 @@
                     maintainAspectRatio: false,
                     layout: { padding: 10 },
                     plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, font: {size: 11}, color: '#8e8e93' } } 
+                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true, font: { size: 11, family: 'Exo 2' }, color: '#7a7a85' } } 
                     }
                 }
             });
